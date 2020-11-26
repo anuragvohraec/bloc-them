@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+  <div id="demo"></div>
+
+  <script type="module">
+    import { html, TemplateResult, render } from 'lit-html';
+    import {Bloc, BlocsProvider, BlocBuilder} from '../dist/index.js';
+    
+
+export class CounterBloc extends Bloc{
+
+constructor(){
+    super(0);
+}
+
+increment(){
+    let n = this.state;
+    n++;
+    this.emit(n);
+}
+
+decrement(){
+    let n = this.state;
+    n--;
+    this.emit(n);
+}
+}
+
+export class CounterBlocProvider extends BlocsProvider{
+constructor(){
+    super([new CounterBloc()]);
+}
+
+builder(){
+    return html`<div><slot></slot></div>`;
+}
+}
+
+
+export class CounterBlocBuilder extends BlocBuilder{
+constructor(){
+    super(CounterBloc);
+}
+
+increment=()=>{
+  this.bloc.increment();
+}
+
+decrement=()=>{
+  this.bloc.decrement();
+}
+
+builder(state){
+    return html`
+    <div>Current state is : ${state}</div>
+    <div><button @click=${this.increment}>increment</button></div>
+    <div><button @click=${this.decrement}>decrement</button></div>
+    `;
+}
+}
+
+customElements.define("counter-bloc-provider", CounterBlocProvider);
+customElements.define("counter-bloc-builder", CounterBlocBuilder);
+
+
+    render(
+      html`
+  <counter-bloc-provider>
+    <div>
+      <h1>Blocs demo</h1>
+      <counter-bloc-builder></counter-bloc-builder>
+    </div>
+  </counter-bloc-provider>
+      `,
+      document.querySelector('#demo')
+    );
+  </script>
+</body>
+</html>
