@@ -60,8 +60,9 @@ decrement=()=>{
 }
 
 builder(state){
+    let color = this.useAttribute["color"];
     return html`
-    <div>Current state is : ${state}</div>
+    <div style="color: ${color}">Current state is : ${state}</div>
     <div><button @click=${this.increment}>increment</button></div>
     <div><button @click=${this.decrement}>decrement</button></div>
     `;
@@ -77,7 +78,7 @@ customElements.define("counter-bloc-builder", CounterBlocBuilder);
   <counter-bloc-provider>
     <div>
       <h1>Blocs demo</h1>
-      <counter-bloc-builder></counter-bloc-builder>
+      <counter-bloc-builder use="color: red;"></counter-bloc-builder>
     </div>
   </counter-bloc-provider>
       `,

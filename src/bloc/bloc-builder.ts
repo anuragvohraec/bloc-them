@@ -1,6 +1,7 @@
 import { Bloc } from "./bloc";
 import { TemplateResult, render } from "lit-html";
 import { BlocType, BlocsProvider } from "./blocs-provider";
+import {BaseBlocsHTMLElement} from '../base';
 
 
 interface BuildWhenFunction<S>{
@@ -12,7 +13,7 @@ export interface BlocBuilderConfig<B extends Bloc<S>, S>{
   buildWhen?: BuildWhenFunction<S>;
 }
 
-export abstract class BlocBuilder<B extends Bloc<S>, S> extends HTMLElement{
+export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLElement{
     private _bloc: B|undefined;
     private _subscriptionId!: string;
     private _prevState!: S;
@@ -40,7 +41,6 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends HTMLElement{
     
 
     connectedCallback(){
-      this.attachShadow({mode: 'open'});
       this._initialize();
     }
     

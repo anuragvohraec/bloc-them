@@ -1,17 +1,17 @@
 import { TemplateResult, render } from "lit-html";
 import { OtherBlocSearchCriteria } from "../bloc/blocs-provider";
+import {BaseBlocsHTMLElement} from '../base';
 
 interface _ClassTypes{
     name: string
 }
 
-export abstract class ReposProvider extends HTMLElement{
+export abstract class ReposProvider extends BaseBlocsHTMLElement{
     constructor(private repos: any[]){
         super();
     }
 
     connectedCallback(){
-        this.attachShadow({mode: 'open'});
         this._build();
     }
 

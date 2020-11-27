@@ -1,6 +1,7 @@
 import { Bloc } from "./bloc";
 import { render, TemplateResult } from "lit-html";
 import { BlocBuilder } from "./bloc-builder";
+import {BaseBlocsHTMLElement} from '../base';
 
 export  interface BlocType<S>{
     new(): Bloc<S>
@@ -10,13 +11,12 @@ export interface OtherBlocSearchCriteria{
     (currentEl: HTMLElement): boolean;
 }
 
-export abstract class BlocsProvider extends HTMLElement{
+export abstract class BlocsProvider extends BaseBlocsHTMLElement{
     constructor(private blocs:Bloc<any>[]){
         super();
     }
 
     connectedCallback(){
-        this.attachShadow({mode: 'open'});
         this._build();
     }
 

@@ -95,3 +95,24 @@ If you customize the configuration a lot, you can consider moving them to indivi
 npm start
 ```
 To run a local development server that serves the basic demo located in `demo/index.html`
+
+
+## Change logs
+
+### "version": "0.0.2"
+1. **use** attribute now on BlocsProvider, BlocBuilder and ReposProvider.\
+In html:
+```html
+ <counter-bloc-builder use="color: red;"></counter-bloc-builder>
+```
+In JS code:
+```js
+builder(state){
+    let color = this.useAttribute["color"];
+    return html`
+    <div style="color: ${color}">Current state is : ${state}</div>
+    <div><button @click=${this.increment}>increment</button></div>
+    <div><button @click=${this.decrement}>decrement</button></div>
+    `;
+}
+```
