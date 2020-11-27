@@ -99,6 +99,10 @@ To run a local development server that serves the basic demo located in `demo/in
 
 ## Change logs
 
+### "version": "0.0.3"
+1. Bug fix: use attribute was putting debug logs to console.
+2. Bug fix: use attributes value must be trimmed before use.
+
 ### "version": "0.0.2"
 1. **use** attribute now on BlocsProvider, BlocBuilder and ReposProvider.\
 In html:
