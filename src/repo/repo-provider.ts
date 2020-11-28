@@ -34,7 +34,10 @@ export abstract class ReposProvider extends BaseBlocsHTMLElement{
                     }
                 }
             }
-            let t: HTMLElement|null = currentEl.parentElement;
+            let t: HTMLElement|null = currentEl.parentNode as HTMLElement;
+            if(t instanceof ShadowRoot){
+                t = t.host as HTMLElement;
+            }
             currentEl = t;
         }
     }

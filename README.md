@@ -99,6 +99,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 ## Change logs
 
+### "version": "0.0.4",
+1. Bug fix: parentElement is returned null often when nesting custom elements. This fixes that issue and uses parent node and host property to get to the actual parent node.
+
 ### "version": "0.0.3"
 1. Bug fix: use attribute was putting debug logs to console.
 2. Bug fix: use attributes value must be trimmed before use.

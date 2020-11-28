@@ -41,7 +41,10 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
                     return currentEl.bloc;
                 }
             }
-            let t: HTMLElement|null = currentEl.parentElement;
+            let t: HTMLElement|null = currentEl.parentNode as HTMLElement;
+            if(t instanceof ShadowRoot){
+                t = t.host as HTMLElement;
+            }
             currentEl = t;
         }
     }
