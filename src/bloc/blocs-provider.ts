@@ -4,7 +4,7 @@ import { BlocBuilder } from "./bloc-builder";
 import {BaseBlocsHTMLElement} from '../base';
 
 export  interface BlocType<S>{
-    new(): Bloc<S>
+    new(...args: any[]): Bloc<S>
 }
 
 export interface OtherBlocSearchCriteria{
