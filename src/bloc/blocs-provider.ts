@@ -3,7 +3,7 @@ import { render, TemplateResult } from "lit-html";
 import { BlocBuilder } from "./bloc-builder";
 import {BaseBlocsHTMLElement} from '../base';
 
-export  interface BlocType<S, B extends Bloc<S>>{
+export  interface BlocType< B extends Bloc<S>,S>{
     new(...args: any[]): B
 }
 
@@ -20,7 +20,7 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
         this._build();
     }
 
-    _findBloc<S,B extends Bloc<S>>(blocType: BlocType<S,B>): B|undefined{
+    _findBloc<B extends Bloc<S>,S>(blocType: BlocType<B,S>): B|undefined{
         for(let bloc of this.blocs){
             if(bloc.constructor.name === blocType.name){
                 return bloc as B;
@@ -28,12 +28,12 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
         }
     }
 
-    static of<S,B extends Bloc<S>>(blocType: BlocType<S,B>, startingElement:HTMLElement, otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): B|undefined{
+    static of<B extends Bloc<S>,S>(blocType: BlocType<B,S>, startingElement:HTMLElement, otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): B|undefined{
         let currentEl: HTMLElement|null = startingElement;
         while(currentEl){
             if(otherSearchCriteria(currentEl)){
                 if(currentEl instanceof BlocsProvider){
-                    let found_bloc = currentEl._findBloc<S,B>(blocType);
+                    let found_bloc = currentEl._findBloc<B,S>(blocType);
                     if(found_bloc){
                         return found_bloc;
                     }

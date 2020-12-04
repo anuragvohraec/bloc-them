@@ -19,7 +19,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     private _prevState!: S;
     private _configs: BlocBuilderConfig<B,S>;
   
-    constructor(private blocType: BlocType<S>, configs?: BlocBuilderConfig<B,S>){
+    constructor(private blocType: BlocType<B,S>, configs?: BlocBuilderConfig<B,S>){
       super();
       let defaultConfig: BlocBuilderConfig<B,S>={
         buildWhen: (preState: S, newState:S)=>{
