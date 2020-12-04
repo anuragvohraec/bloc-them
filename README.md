@@ -99,6 +99,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 ## Change logs
 
+### "version": "1.0.0"
+1. Changed the generic structure for blocs, to make them more generic.
+
 ### "version": "0.0.5"
 1. Enhancement : As of now Blocs could only create no argument constructor, now blocs can create Argument based constructor.
 
