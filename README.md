@@ -1,6 +1,151 @@
-# \<bloc-them>
+# Bloc-Them
+A Business Logic Component implementation for front end Javascript web components.
 
-This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
+If you have not heard what is Bloc, then check out the [theory](##theory).\
+If you are familiar with Bloc, then read descriptions of the components this library offers to use Bloc Pattern for your front end development.
+
+# What it can do ?
+1. **[use-them](https://www.npmjs.com/package/use-them)** ready to use webcomponent to create PWA mobile apps GUI.
+0
+2. **[lay-them](https://www.npmjs.com/package/lay-them)** to layout your other webcomponents in column, row and stack.
+3. **[route-them](https://www.npmjs.com/package/route-them)** to create routes in your single page application.
+
+
+## Pre-requisite for usage
+1. Basic understanding of ES6 classes and inheritance.
+3. Basic knowledge of [lit-html](https://lit-html.polymer-project.org/).
+
+## Important Classes and uses
+
+### **Bloc<S\>**: where S is state of your app you are trying to control
+Bloc class where in you will implement the non gui business logic.
+For ex:
+```ts
+
+export class CounterBloc extends Bloc<number>{
+  constructor(){
+      super(0); //passing in initial state as 0;
+  }
+
+  //emit is used to give new states of your app.
+
+//increment increases the sate your app by 1 and then emits the new state, so that all other GUI components, which depends on this count can re-render themselves to this new state.
+  increment(){
+      let n = this.state;
+      n++;
+      this.emit(n);
+  }
+
+//decrement decreases the state and then emit this new state.
+  decrement(){
+      let n = this.state;
+      n--;
+      this.emit(n);
+  }
+}
+```
+The above bloc tries to manage count state of your app.
+
+You can create various such bloc to control other aspects of overall state of your app.
+And then create methods on this blocs to, which will modify state and then call emit to publish this new state.
+
+### **BlocsProvider**
+This class is a **[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)**, which aims to provide blocs to other components of your app.
+**One BlocsProvider can provide multiple types of blocs** to all its children in the DOM tree.
+And hence bloc is plural in BlocsProvider, as its job is to provide blocs to webcomponents below this.
+
+```ts
+
+export class CounterBlocProvider extends BlocsProvider{
+  greeting_message;
+
+  //in the constructor we can can pass an array of blocs, which we want to pass down the DOM tree, inside this webcomponent.
+  constructor(){
+      super([new CounterBloc()]);
+  }
+
+  //This is the final render that should take place on user screen
+  builder(){
+      return html`<div><slot></slot></div>`;//htm literall tage 
+  }
+
+  //Any business logic that needs to be executed before the final render.
+  async prebuild_blo(){
+    await new Promise((res,rej)=>{
+      setTimeout(()=>{
+        this.greeting_message="Hello Bloc World!";
+        res()
+      },3000)
+    });
+  }
+
+  //This is used to render loading, while prebuild_blo is executed and completed.
+  prebuilder(){
+    return html`<div class="preloading">Loading</div>`;
+  }
+}
+
+//defining the web component
+customElements.define("counter-bloc-provider", CounterBlocProvider);
+```
+Important methods on BlocsPovider:
+1. **prebuild_blo** and **prebuilder** hooks are provided if you wanted to do some custom business logic before final rendering, say you wanted to fetch some data from server and then do the final render.
+3. **prebuild_blo** pre-final-render business logic goes inside this., no need to override this if you have no prior business logic.
+3. **prebuilder** this is shown meanwhile prebuild_bloc is running the business logic.
+
+prebuilder_blo, by default, is only called once, after documents connect.
+However we can pass a boolean flag to, super constructor, instead re-run prebuilder, before every render.
+
+### **BlocBuilder<B extends Bloc<S\>, S\>**: where S is state and B is Bloc implementation
+This class is to do the actual building of a **[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)**. It has a builder method which can be used to return TemplateResult objects returned by [lit-html](https://lit-html.polymer-project.org/).
+```ts
+
+export class CounterBlocBuilder extends BlocBuilder{
+
+constructor(){
+    super(CounterBloc);
+}
+
+increment=()=>{
+  this.bloc.increment();
+}
+
+decrement=()=>{
+  this.bloc.decrement();
+}
+
+builder(state){
+    let color = this.useAttribute["color"];
+    return html`
+    <div style="color: ${color}">Current state is : ${state}</div>
+    <div><button @click=${this.increment}>increment</button></div>
+    <div><button @click=${this.decrement}>decrement</button></div>
+    `;
+}
+}
+
+//defining the web component
+customElements.define("counter-bloc-builder", CounterBlocBuilder);
+```
+BlocBuilder constructor also can be provided with a BlocBuilderConfig, which has a parma **useThisBloc**.
+which can be used to provide a bloc directly, without for the need for BlocsProvider to provide it.
+
+
+Now after defining bloc, blocs provider and bloc builder you can use, this as like this in HTML.
+```
+//lit-html tag
+html`
+  <counter-bloc-provider>
+    <div>
+      <h1>Blocs demo</h1>
+      <counter-bloc-builder use="color: red;"></counter-bloc-builder>
+    </div>
+  </counter-bloc-provider>
+      `
+```
+
+
+
 
 ## Installation
 ```bash
@@ -11,62 +156,94 @@ npm i bloc-them
 For a detail usage see the demo directory in the git.
 
 ```ts
-import {Bloc, BlocsProvider, BlocBuilder} from 'lit-bloc-js';
-import {html, TemplateResult} from 'lit-html';
+import { html, TemplateResult, render } from 'lit-html';
+import {Bloc, BlocsProvider, BlocBuilder} from '../dist/index.js';
+    
 
-export class CounterBloc extends Bloc<number>{
+export class CounterBloc extends Bloc{
 
-  constructor(){
-      super(0);
-  }
+constructor(){
+    super(0);
+}
 
-  increment(){
-      let n = this.state;
-      n++;
-      this.emit(n);
-  }
+increment(){
+    let n = this.state;
+    n++;
+    this.emit(n);
+}
 
-  decrement(){
-      let n = this.state;
-      n--;
-      this.emit(n);
-  }
+decrement(){
+    let n = this.state;
+    n--;
+    this.emit(n);
+}
 }
 
 export class CounterBlocProvider extends BlocsProvider{
-  constructor(){
-      super([new CounterBloc()]);
-  }
+  greeting_message;
 
-  builder(){
-      return html`<div><slot></slot></div>`;
-  }
+constructor(){
+    super([new CounterBloc()]);
+}
+
+builder(){
+    return html`<div><slot></slot></div>`;
+}
+
+async prebuild_blo(){
+  await new Promise((res,rej)=>{
+    setTimeout(()=>{
+      this.greeting_message="Hello Bloc World!";
+      res()
+    },3000)
+  });
+}
+
+prebuilder(){
+  return html`<div class="preloading">Loading</div>`;
+}
 }
 
 
-export class CounterBlocBuilder extends BlocBuilder<CounterBloc, number>{
-  constructor(){
-      super(CounterBloc);
-  }
+export class CounterBlocBuilder extends BlocBuilder{
 
-  increment=()=>{
-    this.bloc?.increment();
-  }
-
-  decrement=()=>{
-    this.bloc?.decrement();
-  }
-
-  builder(state: number): TemplateResult{
-    console.log("building");
-    
-      return html`
-      <div>Current state is : ${state}</div>
-      <div><button @click=${this.increment}>increment</button></div>
-      <div><button @click=${this.decrement}>decrement</button></div>
-      `;
-  }
+constructor(){
+    super(CounterBloc);
 }
+
+increment=()=>{
+  this.bloc.increment();
+}
+
+decrement=()=>{
+  this.bloc.decrement();
+}
+
+builder(state){
+    let color = this.useAttribute["color"];
+    return html`
+    <div style="color: ${color}">Current state is : ${state}</div>
+    <div><button @click=${this.increment}>increment</button></div>
+    <div><button @click=${this.decrement}>decrement</button></div>
+    `;
+}
+}
+
+customElements.define("counter-bloc-provider", CounterBlocProvider);
+customElements.define("counter-bloc-builder", CounterBlocBuilder);
+
+
+    render(
+      html`
+  <counter-bloc-provider>
+    <div>
+      <h1>Blocs demo</h1>
+      <counter-bloc-builder use="color: red;"></counter-bloc-builder>
+    </div>
+  </counter-bloc-provider>
+      `,
+      document.querySelector('#demo')
+    );
 ```
 ```html
 <script type="module">
@@ -99,6 +276,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 ## Change logs
 
+### "version": "3.0.0"
+1. Added a prebuid step, to perform async business logic before final render. While this final render is dne, a prerender can be displayed, to show loading.
+
 ### "version": "1.0.0"
 1. Changed the generic structure for blocs, to make them more generic.
 
@@ -110,9 +290,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 ### "version": "0.0.3"
 1. Bug fix: use attribute was putting debug logs to console.
-2. Bug fix: use attributes value must be trimmed before use.
+3. Bug fix: use attributes value must be trimmed before use.
 
-### "version": "0.0.2"
+### "version": "0.0.3"
 1. **use** attribute now on BlocsProvider, BlocBuilder and ReposProvider.\
 In html:
 ```html
@@ -129,3 +309,47 @@ builder(state){
     `;
 }
 ```
+
+
+
+## Theory
+
+### What is Business Logic ?
+Lets explain it with examples: 
+
+1. Say you are designing an Arithmetic calculator App. 
+Then all logics(**non gui codes** which perform the actual intent of your app) that you will write specifically for your calculator, say **calculate_square_root**, or any other non-gui function(one which do not render's GUI to screen), is termed as Business Logic.
+3. Say you are writing a Social media app.
+then all logics(**non gui codes** which perform the actual intent of your app) that you will write specifically for your social media pp, say **fetch_user_profile**, **add_new_user_to_indexedb**,or any other non-gui function(one which do not render's GUI to screen), is termed as Business Logic.
+
+Business logic is the basic functionality of your app, which you ae trying to offer to client apart frm pretty GUI.
+
+### The core aim of business logic ?
+The core aim of a business logic is to modulate/maintain/control a state of your application. 
+For example,all non gui code for user sign up form, is trying to maintain an object which has all form information user has entered in the form or required to submit the sign up form.
+
+So **the core aim business logic is to modulate state of your app.**
+Whenever it modulates this state, the front end GUI, which depends on this state muts re-render to give the latest update to user.
+
+
+For example user types in something in the search box for an app.
+The Search box will try to validate it.
+Then tries to make a request to resource, which will give the result and once received response from the sources system, may need to modify it to display appropriately on front end GUI.
+
+### Whats the problem with existing JS system ?
+If you are using vanilla JS to design a big sized app, then there is 99.99% probability, that the one who will maintain your apps for bugs,  will pull their hairs to keep track of places where in you as a developer have written the business logic, which controls state of the application. 
+
+Without a framework, the business logic is spread every where, which experience says is very difficult to track, which ultimate will make a challenge to determine, why the current state of your app is something out of expectation, and further which portion of your code is responsible for that modification.
+
+## How Bloc pattern solves the above problem ?
+Bloc : Business Logic Components.
+Bloc is framework to keep all your business logic at one place, meanwhile making a predictable state change, so you can track exactly which portion of code has made the change in the state.
+
+A single bloc maintains a single type of state.\
+For example:
+1. For a counter portion of your app, CounterBloc will only manage current count (state) of the app.
+3. For list of options, will maintain current selection and all options as state.
+
+And your GUI uses this state to render out put data. So if the data is incorrect, you exactly know that the Bloc which manages this portion of state of your app, is responsible for this inconsistent behavior.
+
+
