@@ -57,44 +57,19 @@ And hence bloc is plural in BlocsProvider, as its job is to provide blocs to web
 ```ts
 
 export class CounterBlocProvider extends BlocsProvider{
-  greeting_message;
+constructor(){
+    super([new CounterBloc()]);
+}
 
-  //in the constructor we can can pass an array of blocs, which we want to pass down the DOM tree, inside this webcomponent.
-  constructor(){
-      super([new CounterBloc()]);
-  }
-
-  //This is the final render that should take place on user screen
-  builder(){
-      return html`<div><slot></slot></div>`;//htm literall tage 
-  }
-
-  //Any business logic that needs to be executed before the final render.
-  async prebuild_blo(){
-    await new Promise((res,rej)=>{
-      setTimeout(()=>{
-        this.greeting_message="Hello Bloc World!";
-        res()
-      },3000)
-    });
-  }
-
-  //This is used to render loading, while prebuild_blo is executed and completed.
-  prebuilder(){
-    return html`<div class="preloading">Loading</div>`;
-  }
+builder(){
+    return html`<div><slot></slot></div>`;
+}
 }
 
 //defining the web component
 customElements.define("counter-bloc-provider", CounterBlocProvider);
 ```
-Important methods on BlocsPovider:
-1. **prebuild_blo** and **prebuilder** hooks are provided if you wanted to do some custom business logic before final rendering, say you wanted to fetch some data from server and then do the final render.
-3. **prebuild_blo** pre-final-render business logic goes inside this., no need to override this if you have no prior business logic.
-3. **prebuilder** this is shown meanwhile prebuild_bloc is running the business logic.
 
-prebuilder_blo, by default, is only called once, after documents connect.
-However we can pass a boolean flag to, super constructor, instead re-run prebuilder, before every render.
 
 ### **BlocBuilder<B extends Bloc<S\>, S\>**: where S is state and B is Bloc implementation
 This class is to do the actual building of a **[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)**. It has a builder method which can be used to return TemplateResult objects returned by [lit-html](https://lit-html.polymer-project.org/).
@@ -156,8 +131,8 @@ npm i bloc-them
 For a detail usage see the demo directory in the git.
 
 ```ts
-import { html, TemplateResult, render } from 'lit-html';
-import {Bloc, BlocsProvider, BlocBuilder} from '../dist/index.js';
+    import { html, TemplateResult, render } from 'lit-html';
+    import {Bloc, BlocsProvider, BlocBuilder} from '../dist/index.js';
     
 
 export class CounterBloc extends Bloc{
@@ -180,8 +155,6 @@ decrement(){
 }
 
 export class CounterBlocProvider extends BlocsProvider{
-  greeting_message;
-
 constructor(){
     super([new CounterBloc()]);
 }
@@ -189,24 +162,10 @@ constructor(){
 builder(){
     return html`<div><slot></slot></div>`;
 }
-
-async prebuild_blo(){
-  await new Promise((res,rej)=>{
-    setTimeout(()=>{
-      this.greeting_message="Hello Bloc World!";
-      res()
-    },3000)
-  });
-}
-
-prebuilder(){
-  return html`<div class="preloading">Loading</div>`;
-}
 }
 
 
 export class CounterBlocBuilder extends BlocBuilder{
-
 constructor(){
     super(CounterBloc);
 }
