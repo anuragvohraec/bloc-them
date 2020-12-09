@@ -277,6 +277,9 @@ To run a local development server that serves the basic demo located in `demo/in
 ## Change logs
 
 ### "version": "3.0.0"
+1. Version 2.0.0 is failed concept and often causes infinite loop. Discarding the changes back.
+
+### "version": "2.0.0" : FAILED, DO NOT USE IT
 1. Added a prebuid step, to perform async business logic before final render. While this final render is dne, a prerender can be displayed, to show loading.
 
 ### "version": "1.0.0"

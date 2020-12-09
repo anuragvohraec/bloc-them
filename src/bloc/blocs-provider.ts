@@ -12,7 +12,7 @@ export interface OtherBlocSearchCriteria{
 }
 
 export abstract class BlocsProvider extends BaseBlocsHTMLElement{
-    constructor(private blocs:Bloc<any>[], private preBuildOnlyOnce:boolean=true){
+    constructor(private blocs:Bloc<any>[]){
         super();
     }
 
@@ -49,14 +49,7 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
         }
     }
 
-    async _build(){
-        if(!this._prebuild_step_done){
-            render(this.prebuilder(), this.shadowRoot!); 
-            await this.prebuild_blo();
-            if(this.preBuildOnlyOnce){
-              this._prebuild_step_done=true;
-            }
-        }
+    _build(){
         let gui = this.builder();
         render(gui,this.shadowRoot!);
      }

@@ -1,5 +1,5 @@
 import { Bloc } from "./bloc";
-import { TemplateResult, render, html } from "lit-html";
+import { TemplateResult, render } from "lit-html";
 import { BlocType, BlocsProvider } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
 
@@ -11,10 +11,6 @@ interface BuildWhenFunction<S>{
 export interface BlocBuilderConfig<B extends Bloc<S>, S>{
   useThisBloc?:B;
   buildWhen?: BuildWhenFunction<S>;
-  /**
-   * default is true, that is pre-build step is performed only once for each render/build, on connection of this element to DOM.
-   */
-  preBuildOnlyOnce?:boolean;
 }
 
 export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLElement{
@@ -22,12 +18,10 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     private _subscriptionId!: string;
     private _prevState!: S;
     private _configs: BlocBuilderConfig<B,S>;
-
   
     constructor(private blocType: BlocType<B,S>, configs?: BlocBuilderConfig<B,S>){
       super();
       let defaultConfig: BlocBuilderConfig<B,S>={
-        preBuildOnlyOnce: true,
         buildWhen: (preState: S, newState:S)=>{
           if(newState!==preState){
               return true;
@@ -51,7 +45,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     }
     
 
-    async _initialize(){
+    _initialize(){
       //find the bloc
       this._bloc = this._configs.useThisBloc ? this._configs.useThisBloc: BlocsProvider.of<B,S>(this.blocType,this);
 
@@ -76,16 +70,9 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       this._bloc!._stopListening(this._subscriptionId);
     }
     
-    async _build(state: S){
-      if(!this._prebuild_step_done){
-        render(this.prebuilder(), this.shadowRoot!); 
-        await this.prebuild_blo(state);
-        if(this._configs!.preBuildOnlyOnce){
-          this._prebuild_step_done=true;
-        }
-      }
-      let gui = this.builder(state);
-      render(gui,this.shadowRoot!);
+    _build(state: S){
+       let gui = this.builder(state);
+       render(gui,this.shadowRoot!);
     }
 
     abstract builder(state: S): TemplateResult;

@@ -7,7 +7,7 @@ interface _ClassTypes{
 }
 
 export abstract class ReposProvider extends BaseBlocsHTMLElement{
-    constructor(private repos: any[], private preBuildOnlyOnce:boolean=true){
+    constructor(private repos: any[]){
         super();
     }
 
@@ -42,14 +42,7 @@ export abstract class ReposProvider extends BaseBlocsHTMLElement{
         }
     }
 
-    async _build(){
-        if(!this._prebuild_step_done){
-            render(this.prebuilder(), this.shadowRoot!); 
-            await this.prebuild_blo();
-            if(this.preBuildOnlyOnce){
-              this._prebuild_step_done=true;
-            }
-        }
+    _build(){
         let gui = this.builder();
         render(gui,this.shadowRoot!);
      }

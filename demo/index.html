@@ -36,8 +36,6 @@ decrement(){
 }
 
 export class CounterBlocProvider extends BlocsProvider{
-  greeting_message;
-
 constructor(){
     super([new CounterBloc()]);
 }
@@ -45,24 +43,10 @@ constructor(){
 builder(){
     return html`<div><slot></slot></div>`;
 }
-
-async prebuild_blo(){
-  await new Promise((res,rej)=>{
-    setTimeout(()=>{
-      this.greeting_message="Hello Bloc World!";
-      res()
-    },3000)
-  });
-}
-
-prebuilder(){
-  return html`<div class="preloading">Loading</div>`;
-}
 }
 
 
 export class CounterBlocBuilder extends BlocBuilder{
-
 constructor(){
     super(CounterBloc);
 }
