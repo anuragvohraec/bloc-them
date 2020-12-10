@@ -235,6 +235,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 ## Change logs
 
+### "version": "3.0.2"
+1. Changed the generic structure for blocs, to make them more generic.
+
 ### "version": "3.0.0"
 1. Version 2.0.0 is failed concept and often causes infinite loop. Discarding the changes back.
 
