@@ -7,6 +7,9 @@ export  interface BlocType< B extends Bloc<S>,S>{
     new(...args: any[]): B
 }
 
+/**
+ * This function can help skip or pik some elements even when they are valid elements capable of providing the bloc
+ */
 export interface OtherBlocSearchCriteria{
     (currentEl: HTMLElement): boolean;
 }

@@ -234,6 +234,8 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "3.0.3"
+1. Now in widget builder config we can pass custom search criteria to select blocs. This custom 
 
 ### "version": "3.0.2"
 1. Changed the generic structure for blocs, to make them more generic.

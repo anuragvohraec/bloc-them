@@ -1,6 +1,6 @@
 import { Bloc } from "./bloc";
 import { TemplateResult, render } from "lit-html";
-import { BlocType, BlocsProvider } from "./blocs-provider";
+import { BlocType, BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
 
 
@@ -11,6 +11,7 @@ interface BuildWhenFunction<S>{
 export interface BlocBuilderConfig<B extends Bloc<S>, S>{
   useThisBloc?:B;
   buildWhen?: BuildWhenFunction<S>;
+  otherSearchCriteria?: OtherBlocSearchCriteria;
 }
 
 export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLElement{
@@ -53,7 +54,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
     _initialize(){
       //find the bloc
-      this._bloc = this._configs.useThisBloc ? this._configs.useThisBloc: BlocsProvider.of<B,S>(this.blocType,this);
+      this._bloc = this._configs.useThisBloc ? this._configs.useThisBloc: BlocsProvider.of<B,S>(this.blocType,this,this._configs.otherSearchCriteria);
 
       //if bloc is found;
       if(this._bloc){
