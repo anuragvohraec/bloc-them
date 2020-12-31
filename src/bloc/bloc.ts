@@ -3,8 +3,9 @@
  * 1. One which will not modify the state themselves.
  * 2. No calculation at all in Pure functions. There only objective must be to set values, which can triggers sate change of your elements.
  */
-interface PureFunction<S>{
+export interface PureFunction<S>{
     (newState: S):void;
+    _ln_name:string;
   }
   
 interface _PureFunctionMap<S>{
@@ -22,7 +23,12 @@ export abstract class Bloc<S>{
     private _listeners: _PureFunctionMap<S> ={};
     private _state: S
 
-    constructor(initState: S){
+    /**
+     * 
+     * @param initState 
+     * @param bloc_name Can provide this for debugging purpose
+     */
+    constructor(initState: S, private bloc_name?:string){
         this._state=initState;
     }
 
@@ -42,7 +48,7 @@ export abstract class Bloc<S>{
             try{
                 this._listeners[`${l}`](newState);
             }catch(e){
-                console.log(`Listener ${l} do not have try catch bloc. It throws error which is not caught in its pure function.`);
+                console.log(`Listener ${this._listeners[l]._ln_name} do not have try catch bloc. It throws error which is not caught in its pure function.`);
                 console.error(e);
             }
         }

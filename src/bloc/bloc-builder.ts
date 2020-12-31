@@ -1,4 +1,4 @@
-import { Bloc } from "./bloc";
+import { Bloc, PureFunction } from "./bloc";
 import { TemplateResult, render } from "lit-html";
 import { BlocType, BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
@@ -59,14 +59,22 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       //if bloc is found;
       if(this._bloc){
         this._prevState = this._bloc.state;
-        
-        this._subscriptionId = this._bloc._listen((newState: S)=>{
+        const l : PureFunction<S>= (newState: S)=>{
+          try{
             if(this._configs.buildWhen!(this._prevState, newState)){
-              this._prevState = newState;
               this._build(newState);
+              this._prevState = newState;
             }
-          
-        });
+          }catch(e){
+            console.error(`${l._ln_name} listener function has caught an error. Which mostly happens when your builder function is throwing error, which is not what should be done/happen!`);
+            console.error(e);
+          }
+      };
+        l._ln_name = this.tagName;
+        if(this.id){
+          l._ln_name+=`#${this.id}`;
+        }
+        this._subscriptionId = this._bloc._listen(l);
         this._build(this._prevState);
       }else{
         throw `No parent found which has ${this.blocType.name} bloc`;

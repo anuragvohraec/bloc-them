@@ -234,6 +234,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "3.0.4"
+1. Added more debugging features to bloc builder.
+
 ### "version": "3.0.3"
 1. Now in widget builder config we can pass custom search criteria to select blocs. This custom 
 
