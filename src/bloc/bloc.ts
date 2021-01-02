@@ -48,7 +48,7 @@ export abstract class Bloc<S>{
             try{
                 this._listeners[`${l}`](newState);
             }catch(e){
-                console.log(`Listener ${this._listeners[l]._ln_name} do not have try catch bloc. It throws error which is not caught in its pure function.`);
+                console.log(`Listener ${this._listeners[l]?._ln_name} do not have try catch bloc. It throws error which is not caught in its pure function.`);
                 console.error(e);
             }
         }

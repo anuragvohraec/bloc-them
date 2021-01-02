@@ -1,7 +1,7 @@
 # Bloc-Them
 A Business Logic Component implementation for front end Javascript web components.
 
-If you have not heard what is Bloc, then check out the [theory](##theory).\
+If you have not heard what is Bloc, then check out the [theory](#theory).\
 If you are familiar with Bloc, then read descriptions of the components this library offers to use Bloc Pattern for your front end development.
 
 # What it can do ?
