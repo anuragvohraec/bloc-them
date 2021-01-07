@@ -46,7 +46,9 @@ export abstract class Bloc<S>{
         //emit new state should inform all listeners
         for(let l of Object.keys(this._listeners)){
             try{
-                this._listeners[`${l}`](newState);
+                if(this._listeners[`${l}`]){
+                  this._listeners[`${l}`](newState);
+                }
             }catch(e){
                 console.log(`Listener ${this._listeners[l]?._ln_name} do not have try catch bloc. It throws error which is not caught in its pure function.`);
                 console.error(e);
