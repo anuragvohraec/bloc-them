@@ -234,6 +234,10 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "4.0.0"
+1. Have to change bloc searching and naming, as typescript/bundling tools were renaming classes to different names and as such blocs were not visible in all cases.
+Now when you extends a bloc you need to provide a protected property _name . This same name is used to search for the bloc in the dom tree.
+
 ### "version": "3.0.4"
 1. Added more debugging features to bloc builder.
 
