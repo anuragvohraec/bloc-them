@@ -3,6 +3,15 @@ export interface BlocThemUseAttribute{
     [key:string]:string;
 }
 
+export abstract class HasName{
+    constructor(private _name:string){}
+
+    public get name() : string {
+        return this._name;
+    }
+    
+}
+
 
 export class BaseBlocsHTMLElement extends HTMLElement{
     private _useAttr?: BlocThemUseAttribute;

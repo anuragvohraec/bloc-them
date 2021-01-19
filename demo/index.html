@@ -19,7 +19,7 @@
 export class CounterBloc extends Bloc{
 
 constructor(){
-    super(0);
+    super(0,"CounterBloc");
 }
 
 increment(){
@@ -48,7 +48,7 @@ builder(){
 
 export class CounterBlocBuilder extends BlocBuilder{
 constructor(){
-    super(CounterBloc);
+    super("CounterBloc");
 }
 
 increment=()=>{

@@ -1,3 +1,5 @@
+import { HasName } from '../base';
+
 /**
  * Pure functions:
  * 1. One which will not modify the state themselves.
@@ -18,7 +20,7 @@ interface _PureFunctionMap<S>{
  * Its holds a state and all business logic which tries to modify this state should be inside this.
  * This exposes a single method emit to external Api, which must be used to emit new states.
  */  
-export abstract class Bloc<S>{
+export abstract class Bloc<S> extends HasName{
     private _listener_id_ref=1;
     private _listeners: _PureFunctionMap<S> ={};
     private _state: S
@@ -26,9 +28,9 @@ export abstract class Bloc<S>{
     /**
      * 
      * @param initState 
-     * @param bloc_name Can provide this for debugging purpose
      */
-    constructor(initState: S, private bloc_name?:string){
+    constructor(initState: S,_name:string){
+        super(_name);
         this._state=initState;
     }
 

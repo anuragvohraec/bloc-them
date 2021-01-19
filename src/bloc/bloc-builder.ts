@@ -1,6 +1,6 @@
 import { Bloc, PureFunction } from "./bloc";
 import { TemplateResult, render } from "lit-html";
-import { BlocType, BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
+import {BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
 
 
@@ -20,7 +20,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     private _prevState!: S;
     private _configs: BlocBuilderConfig<B,S>;
   
-    constructor(protected blocType: BlocType<B,S>, configs?: BlocBuilderConfig<B,S>){
+    constructor(protected nameOfBlocToSearch:string, configs?: BlocBuilderConfig<B,S>){
       super();
       let defaultConfig: BlocBuilderConfig<B,S>={
         buildWhen: (preState: S, newState:S)=>{
@@ -54,7 +54,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
     _initialize(){
       //find the bloc
-      this._bloc = this._configs.useThisBloc ? this._configs.useThisBloc: BlocsProvider.of<B,S>(this.blocType,this,this._configs.otherSearchCriteria);
+      this._bloc = this._configs.useThisBloc ? this._configs.useThisBloc: BlocsProvider.of<B,S>(this.nameOfBlocToSearch,this,this._configs.otherSearchCriteria);
 
       //if bloc is found;
       if(this._bloc){
@@ -77,7 +77,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         this._subscriptionId = this._bloc._listen(l);
         this._build(this._prevState);
       }else{
-        throw `No parent found which has ${this.blocType.name} bloc`;
+        throw `No parent found which has ${this.nameOfBlocToSearch} bloc`;
       }
     }
   
