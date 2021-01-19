@@ -4,8 +4,8 @@ export interface BlocThemUseAttribute{
 }
 
 export abstract class HasName{
-    constructor(private _name:string){}
-
+    protected abstract _name:string;
+    
     public get name() : string {
         return this._name;
     }

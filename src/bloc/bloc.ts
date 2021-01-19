@@ -30,7 +30,7 @@ export abstract class Bloc<S> extends HasName{
      * @param initState 
      */
     constructor(initState: S,_name:string){
-        super(_name);
+        super();
         this._state=initState;
     }
 
