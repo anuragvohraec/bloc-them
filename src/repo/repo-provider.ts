@@ -2,8 +2,12 @@ import { TemplateResult, render } from "lit-html";
 import { OtherBlocSearchCriteria } from "../bloc/blocs-provider";
 import {BaseBlocsHTMLElement, HasNameAndHost} from '../base';
 
+export abstract class Repository extends HasNameAndHost{
+
+}
+
 export abstract class ReposProvider extends BaseBlocsHTMLElement{
-    constructor(private _repoMap: Record<string,HasNameAndHost>){
+    constructor(private _repoMap: Record<string,Repository>){
         super();
         for(let rn of Object.keys(this._repoMap)){
             const repo = this._repoMap[rn];
@@ -13,7 +17,7 @@ export abstract class ReposProvider extends BaseBlocsHTMLElement{
     }
 
     
-    public get reposMap() : Record<string,HasNameAndHost> {
+    public get reposMap() : Record<string,Repository> {
         return this._repoMap;
     }
     
@@ -22,7 +26,7 @@ export abstract class ReposProvider extends BaseBlocsHTMLElement{
         this._build();
     }
 
-    static of<R extends HasNameAndHost>(repoName:string, startingElement: HTMLElement,otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): R|undefined{
+    static of<R extends Repository>(repoName:string, startingElement: HTMLElement,otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): R|undefined{
         let currentEl: HTMLElement|null = startingElement;
         while(currentEl){
             if(otherSearchCriteria(currentEl)){

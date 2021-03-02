@@ -1,5 +1,6 @@
 import { HasNameAndHost } from '../base';
 import { BlocsProvider } from './blocs-provider';
+import {ReposProvider, Repository} from '../repo/repo-provider';
 
 /**
  * Pure functions:
@@ -36,16 +37,16 @@ export abstract class Bloc<S> extends HasNameAndHost{
     private _listener_id_ref=1;
     private _listeners: _PureFunctionMap<S> ={};
     private _state: S;
-    protected _reposMap:Record<string,HasNameAndHost>={};
+    protected _reposMap:Record<string,Repository>={};
     protected _blocsMap:Record<string,Bloc<any>>={};
 
     
-    public get reposMap() : Record<string,HasNameAndHost> {
+    public get reposMap() : Record<string,Repository> {
       return this._reposMap;
     }
 
     
-    public get blocsMap() : Record<string,HasNameAndHost> {
+    public get blocsMap() : Record<string,Bloc<any>> {
       return this._blocsMap;
     }
     
@@ -62,10 +63,10 @@ export abstract class Bloc<S> extends HasNameAndHost{
       return b as B;
     }
 
-    getRepo<R extends HasNameAndHost>(repo_name:string){
-      let r:HasNameAndHost|undefined = this._blocsMap[repo_name];
+    getRepo<R extends Repository>(repo_name:string){
+      let r:Repository|undefined = this._blocsMap[repo_name];
       if(!r){
-        r = BlocsProvider.of(repo_name,this.hostElement);
+        r = ReposProvider.of(repo_name,this.hostElement);
         if(!r){
           throw `<${this.name}> bloc requires repository: ${repo_name}! to function!\r\nPossible reason:\r\ngetRepo method called in constructor of bloc\r\n${repo_name} repository is not present in the reverse DOM hierarchy!`;
         }else{
