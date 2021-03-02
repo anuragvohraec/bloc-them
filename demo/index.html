@@ -13,7 +13,7 @@
 
   <script type="module">
     import { html, TemplateResult, render } from 'lit-html';
-    import {Bloc, BlocsProvider, BlocBuilder} from '../dist/index.js';
+    import {Bloc, BlocsProvider, BlocBuilder,HasName,ReposProvider} from '../dist/index.js';
     
 
 export class CounterBloc extends Bloc{
@@ -45,6 +45,23 @@ builder(){
 }
 }
 
+class AlertFunctionality extends HasName{
+  constructor(){
+    this._name = "AlertFunctionality";
+  }
+
+  alertUser(){
+    alert("Value is greater than 2!");
+  }
+}
+
+class AppUtilsRepository extends ReposProvider{
+  constructor(){
+    super([new AlertFunctionality()])
+  }
+}
+customElements.define("app-utils-repo",AppUtilsRepository);
+
 
 export class CounterBlocBuilder extends BlocBuilder{
 constructor(){
@@ -75,12 +92,14 @@ customElements.define("counter-bloc-builder", CounterBlocBuilder);
 
     render(
       html`
+<app-utils-repo>
   <counter-bloc-provider>
     <div>
       <h1>Blocs demo</h1>
       <counter-bloc-builder use="color: red;"></counter-bloc-builder>
     </div>
   </counter-bloc-provider>
+</app-utils-repo>
       `,
       document.querySelector('#demo')
     );

@@ -12,6 +12,7 @@ export interface BlocBuilderConfig<B extends Bloc<S>, S>{
   useThisBloc?:B;
   buildWhen?: BuildWhenFunction<S>;
   otherSearchCriteria?: OtherBlocSearchCriteria;
+  search_blocs?:string[];
 }
 
 export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLElement{
@@ -19,6 +20,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     private _subscriptionId!: string;
     private _prevState!: S;
     private _configs: BlocBuilderConfig<B,S>;
+    private _found_blocs:Record<string,Bloc<any>>={};
   
     constructor(protected nameOfBlocToSearch:string, configs?: BlocBuilderConfig<B,S>){
       super();
@@ -33,8 +35,10 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       }
 
       this._configs={...defaultConfig, ...configs};
+      if(this._configs.useThisBloc){
+        this._configs.useThisBloc.hostElement=this;
+      }
     }
-
     
     public get bloc() : B|undefined {
         return this._bloc;
@@ -49,12 +53,38 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
     connectedCallback(){
       this._initialize();
+      //finding and setting search blocs
+      if(!this._configs.search_blocs){
+        this._configs.search_blocs=[];
+      }
+
+      this._setDependenciesForABloc(this.bloc!);
+
+      this._configs.search_blocs.push(this.nameOfBlocToSearch);
+
+      for(let bn of this._configs.search_blocs){
+        const bloc = BlocsProvider.of(bn,this);
+        if(!bloc){
+          throw `<${this.tagName}> requires bloc: ${bn}! to function!`;
+        }else{
+          this._found_blocs[bn]=bloc;
+        }
+      }
+    }
+
+    getBloc<B extends Bloc<any>>(bn:string):B{
+      const b = this._found_blocs[bn] as B;
+      if(!b){
+        throw `<${this.tagName}> requires bloc: ${bn}! to function!`;
+      }else{
+        return b;
+      }
     }
     
 
     _initialize(){
       //find the bloc
-      this._bloc = this._configs.useThisBloc ? this._configs.useThisBloc: BlocsProvider.of<B,S>(this.nameOfBlocToSearch,this,this._configs.otherSearchCriteria);
+      this._bloc = this._configs.useThisBloc ? this._configs.useThisBloc: BlocsProvider.of<B>(this.nameOfBlocToSearch,this,this._configs.otherSearchCriteria);
 
       //if bloc is found;
       if(this._bloc){

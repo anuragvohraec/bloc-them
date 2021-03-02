@@ -1,4 +1,5 @@
-import { HasName } from '../base';
+import { HasNameAndHost } from '../base';
+import { BlocsProvider } from './blocs-provider';
 
 /**
  * Pure functions:
@@ -14,24 +15,78 @@ interface _PureFunctionMap<S>{
 [key: string]: PureFunction<S>;
 }
 
+interface BlocDependencies{
+  blocs?:string[];
+  repos?:string[];
+}
+
+export function deepFreeze(obj:any){
+  Object.keys(obj).forEach(prop => {
+    if (typeof obj[prop] === 'object' && !Object.isFrozen(obj[prop])) deepFreeze(obj[prop]);
+  });
+  return Object.freeze(obj);
+};
   
 /**
  * Bloc : Business Logic component, is a place where in you place all your business logic.
  * Its holds a state and all business logic which tries to modify this state should be inside this.
  * This exposes a single method emit to external Api, which must be used to emit new states.
  */  
-export abstract class Bloc<S> extends HasName{
+export abstract class Bloc<S> extends HasNameAndHost{
     private _listener_id_ref=1;
     private _listeners: _PureFunctionMap<S> ={};
-    private _state: S
+    private _state: S;
+    protected _reposMap:Record<string,HasNameAndHost>={};
+    protected _blocsMap:Record<string,Bloc<any>>={};
+
+    
+    public get reposMap() : Record<string,HasNameAndHost> {
+      return this._reposMap;
+    }
+
+    
+    public get blocsMap() : Record<string,HasNameAndHost> {
+      return this._blocsMap;
+    }
+    
+    getBloc<B extends Bloc<any>>(bloc_name:string){
+      let b:Bloc<any>|undefined = this._blocsMap[bloc_name];
+      if(!b){
+        b = BlocsProvider.of(bloc_name,this.hostElement);
+        if(!b){
+          throw `<${this.name}> bloc requires bloc: ${bloc_name}! to function!\r\nPossible reason:\r\ngetBloc method called in constructor\r\n${bloc_name} bloc is not present in the reverse DOM hierarchy!`;
+        }else{
+          this._blocsMap[bloc_name]=b;
+        }
+      }
+      return b as B;
+    }
+
+    getRepo<R extends HasNameAndHost>(repo_name:string){
+      let r:HasNameAndHost|undefined = this._blocsMap[repo_name];
+      if(!r){
+        r = BlocsProvider.of(repo_name,this.hostElement);
+        if(!r){
+          throw `<${this.name}> bloc requires repository: ${repo_name}! to function!\r\nPossible reason:\r\ngetRepo method called in constructor of bloc\r\n${repo_name} repository is not present in the reverse DOM hierarchy!`;
+        }else{
+          this._reposMap[repo_name]=r;
+        }
+      }
+      return r as R;
+    }
 
     /**
      * 
-     * @param initState 
+     * @param initState this is mostly used for rendering loading place holder [grey boxes].
+     * @param blocDependencies  this are searched after their host has connected: during the connected callBack.
+     * There for ths dependencies will not be available in the constructor and must not be called in the constructor phase of the bloc.
      */
-    constructor(initState: S){
+    constructor(protected initState: S,public blocDependencies?:BlocDependencies){
         super();
         this._state=initState;
+        if(this.blocDependencies){
+          deepFreeze(this.blocDependencies);
+        }
     }
 
     
@@ -71,7 +126,7 @@ export abstract class Bloc<S> extends HasName{
 
   /**
    * 
-   * @param listeningId Unsubscribe to state litsening state changes
+   * @param listeningId Unsubscribe to state listening state changes
    */
   _stopListening(listeningId: string): void{
     if(listeningId && this._listeners[listeningId]){
