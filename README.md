@@ -102,7 +102,7 @@ builder(state){
 //defining the web component
 customElements.define("counter-bloc-builder", CounterBlocBuilder);
 ```
-BlocBuilder constructor also can be provided with a BlocBuilderConfig, which has a parma **useThisBloc**.
+BlocBuilder constructor also can be provided with a BlocBuilderConfig, which has a parameter **useThisBloc**.
 which can be used to provide a bloc directly, without for the need for BlocsProvider to provide it.
 
 
@@ -130,95 +130,6 @@ npm i bloc-them
 ## Usage
 For a detail usage see the demo directory in the git.
 
-```ts
-    import { html, TemplateResult, render } from 'lit-html';
-    import {Bloc, BlocsProvider, BlocBuilder} from '../dist/index.js';
-    
-
-export class CounterBloc extends Bloc{
-
-constructor(){
-    super(0);
-}
-
-increment(){
-    let n = this.state;
-    n++;
-    this.emit(n);
-}
-
-decrement(){
-    let n = this.state;
-    n--;
-    this.emit(n);
-}
-}
-
-export class CounterBlocProvider extends BlocsProvider{
-constructor(){
-    super([new CounterBloc()]);
-}
-
-builder(){
-    return html`<div><slot></slot></div>`;
-}
-}
-
-
-export class CounterBlocBuilder extends BlocBuilder{
-constructor(){
-    super(CounterBloc);
-}
-
-increment=()=>{
-  this.bloc.increment();
-}
-
-decrement=()=>{
-  this.bloc.decrement();
-}
-
-builder(state){
-    let color = this.useAttribute["color"];
-    return html`
-    <div style="color: ${color}">Current state is : ${state}</div>
-    <div><button @click=${this.increment}>increment</button></div>
-    <div><button @click=${this.decrement}>decrement</button></div>
-    `;
-}
-}
-
-customElements.define("counter-bloc-provider", CounterBlocProvider);
-customElements.define("counter-bloc-builder", CounterBlocBuilder);
-
-
-    render(
-      html`
-  <counter-bloc-provider>
-    <div>
-      <h1>Blocs demo</h1>
-      <counter-bloc-builder use="color: red;"></counter-bloc-builder>
-    </div>
-  </counter-bloc-provider>
-      `,
-      document.querySelector('#demo')
-    );
-```
-```html
-<script type="module">
-   import { html, TemplateResult, render } from 'lit-html';
-    import * from '../dist/index.js';
-</script>
-
-<counter-bloc-provider>
-    <div>
-      <h1>Blocs demo</h1>
-      <counter-bloc-builder></counter-bloc-builder>
-    </div>
-  </counter-bloc-provider>
-```
-
-
 
 ## Tooling configs
 
@@ -234,6 +145,18 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.0"
+1. Instead of passing array in BlocsProvider and ReposProvider, we now supply blocsMap and repoMaps , basically javascript object. Keys for this maps are name of the Bloc/Repo and value will be the instance of Blocs. The benefit of this is faster Bloc search.
+2. Blocs now has hostElement attribute, which can be a BlocsProvider or BlocBuilder. This value is set in connection call and hence is not available during constructor phase. This was added as previously we need to supply a html element to find the blocs, now using this we have automated blocs and repos detection.
+3. getRepo and getBloc methods have been added to bloc to find and search for blocs.
+4. Bloc constructor has now an optional argument BlocDependencies , via which we can mention Blocs and Repos this bloc wil need to function and those repo and blocs will be made available to the bloc. (and can be get with getRepo and getBloc respectively)
+```ts
+interface BlocDependencies{
+  blocs?:string[];
+  repos?:string[];
+}
+```
+
 ### "version": "4.0.0"
 1. Have to change bloc searching and naming, as typescript/bundling tools were renaming classes to different names and as such blocs were not visible in all cases.
 Now when you extends a bloc you need to provide a protected property _name . This same name is used to search for the bloc in the dom tree.
