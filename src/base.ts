@@ -24,7 +24,6 @@ export abstract class HasNameAndHost{
     }
 }
 
-
 export class BaseBlocsHTMLElement extends HTMLElement{
     private _useAttr?: BlocThemUseAttribute;
     constructor(){
@@ -32,44 +31,6 @@ export class BaseBlocsHTMLElement extends HTMLElement{
         this.attachShadow({mode: 'open'});
         let t1 = this.getAttribute("use");
         this._useAttr = BaseBlocsHTMLElement.parseUseAttribute(t1);
-    }
-
-    protected _setDependenciesForABloc(forBloc: Bloc<any>){
-        const repo_not_present:string[]=[];
-        const bloc_not_present:string[]=[];
-
-        if(forBloc.blocDependencies?.repos){
-            for(let rn of forBloc.blocDependencies.repos){
-                const repo  = ReposProvider.of(rn,this);
-                if(!repo){
-                    repo_not_present.push(`<${this.tagName}> uses bloc: ${forBloc.name}, which requires repository: ${rn}! to function!`);
-                }else{
-                    forBloc.reposMap[rn]=repo;
-                }
-            }
-        }
-        if(forBloc.blocDependencies?.blocs){
-            for(let bn of forBloc.blocDependencies.blocs){
-                 const bloc = BlocsProvider.of(bn,this);
-                 if(!bloc){
-                    bloc_not_present.push(`<${this.tagName}> uses bloc: ${forBloc.name}, which requires bloc: ${bn}! to function!`);
-                 }else{
-                    forBloc.blocsMap[bn]=bloc;
-                 }
-            }
-        }
-        let error_msg:string='';
-        if(repo_not_present.length>1){
-            const t = repo_not_present.join("\r\n");
-            error_msg.concat(error_msg,t);
-        }
-        if(bloc_not_present.length>1){
-            const t = bloc_not_present.join("\r\n");
-            error_msg.concat(error_msg,t);
-        }
-        if(error_msg.length>0){
-            throw error_msg;
-        }
     }
     
     public get useAttribute() : BlocThemUseAttribute|undefined {

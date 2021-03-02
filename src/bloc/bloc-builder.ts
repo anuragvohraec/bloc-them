@@ -2,6 +2,7 @@ import { Bloc, PureFunction } from "./bloc";
 import { TemplateResult, render } from "lit-html";
 import {BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
+import {_setDependenciesForABloc} from '../utils';
 
 
 interface BuildWhenFunction<S>{
@@ -58,7 +59,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         this._configs.search_blocs=[];
       }
 
-      this._setDependenciesForABloc(this.bloc!);
+      _setDependenciesForABloc(this.bloc!,this);
 
       this._configs.search_blocs.push(this.nameOfBlocToSearch);
 

@@ -2,7 +2,7 @@ import { Bloc } from "./bloc";
 import { render, TemplateResult } from "lit-html";
 import { BlocBuilder } from "./bloc-builder";
 import {BaseBlocsHTMLElement} from '../base';
-import { ReposProvider } from '../repo/repo-provider';
+import {_setDependenciesForABloc} from '../utils';
 
 // export  interface BlocType< B extends Bloc<S>,S>{
 //     new(...args: any[]): B
@@ -40,7 +40,7 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
         this._build();
         for(let bloc_name of Object.keys(this._blocsMap)){
             const bloc = this._blocsMap[bloc_name];
-            this._setDependenciesForABloc(bloc);
+            _setDependenciesForABloc(bloc,this);
         }
     }
 

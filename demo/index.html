@@ -13,59 +13,109 @@
 
   <script type="module">
     import { html, TemplateResult, render } from 'lit-html';
-    import {Bloc, BlocsProvider, BlocBuilder, HasNameAndHost, ReposProvider} from '../dist/index.js';
+    import {Bloc, BlocsProvider, BlocBuilder, Repository, ReposProvider} from '../dist/index.js';
   
-class AlertFunctionality extends HasNameAndHost{
-  
+class AlertFunctionality extends Repository{
+  _name="AlertFunctionality";
+  alertUser(){
+    alert("You need to know this!");
+  } 
+  sayHello(){
+    alert("Hello");
+  } 
 }
+
+class AppUtilProvider extends ReposProvider{
+  constructor(){
+    super({
+      "AlertFunctionality": new AlertFunctionality()
+    });
+  }
+  builder(){
+    return html`<div><slot></slot></div>`;
+  }
+}
+customElements.define("app-utils-provider",AppUtilProvider);
+
+
+
+class ColorController extends Bloc{
+  _name="ColorController";
+
+  constructor(){
+    super("green");
+  }
+  changeColor(color){
+    this.emit(color);
+  }
+}
+
+class AppLevelBlocs extends BlocsProvider{
+  constructor(){
+    super({
+      ColorController: new ColorController()
+    })
+  }
+  builder(){
+    return html`<div><slot></slot></div>`;
+  }
+}
+customElements.define("app-level-blocs",AppLevelBlocs);
+
+class ColorChangingText extends BlocBuilder{
+  constructor(){
+    super("ColorController")
+  }
+  builder(state){
+    return html`<div style="color: ${state}"><slot></slot></div>`;
+  }
+}
+customElements.define("color-changing-text",ColorChangingText);
+
+
 
 
 class CounterBloc extends Bloc{
 _name="CounterBloc";
 constructor(){
-    super(0,);
+    super(0,{repos: ["AlertFunctionality",], blocs:["ColorController"]});
 }
 
 increment(){
     let n = this.state;
     n++;
     this.emit(n);
+    if(n==3){
+      this.getRepo("ColorController").changeColor("red");
+      this.getRepo("AlertFunctionality").alertUser();
+    }
 }
 
 decrement(){
     let n = this.state;
     n--;
     this.emit(n);
+    if(n<3){
+      this.getRepo("ColorController").changeColor("green");
+    }
 }
+
+  sayHello(){
+    this.getRepo("AlertFunctionality").sayHello();
+  }
 }
 
 export class CounterBlocProvider extends BlocsProvider{
 constructor(){
-    super([new CounterBloc()]);
+    super({
+      CounterBloc:new CounterBloc()
+    });
 }
 
 builder(){
     return html`<div><slot></slot></div>`;
 }
 }
-
-class AlertFunctionality extends HasName{
-  constructor(){
-    this._name = "AlertFunctionality";
-  }
-
-  alertUser(){
-    alert("Value is greater than 2!");
-  }
-}
-
-class AppUtilsRepository extends ReposProvider{
-  constructor(){
-    super([new AlertFunctionality()])
-  }
-}
-customElements.define("app-utils-repo",AppUtilsRepository);
-
 
 export class CounterBlocBuilder extends BlocBuilder{
 constructor(){
@@ -79,13 +129,19 @@ increment=()=>{
 decrement=()=>{
   this.bloc.decrement();
 }
+sayHello=()=>{
+  this.bloc.sayHello();
+}
 
 builder(state){
     let color = this.useAttribute["color"];
     return html`
-    <div style="color: ${color}">Current state is : ${state}</div>
+    <color-changing-text>
+      <div>Current state is : ${state}</div>
+    </color-changing-text>
     <div><button @click=${this.increment}>increment</button></div>
     <div><button @click=${this.decrement}>decrement</button></div>
+    <div><button @click=${this.sayHello}>Say Hello</button></div>
     `;
 }
 }
@@ -96,14 +152,16 @@ customElements.define("counter-bloc-builder", CounterBlocBuilder);
 
     render(
       html`
-<app-utils-repo>
-  <counter-bloc-provider>
-    <div>
-      <h1>Blocs demo</h1>
-      <counter-bloc-builder use="color: red;"></counter-bloc-builder>
-    </div>
-  </counter-bloc-provider>
-</app-utils-repo>
+<app-utils-provider>
+  <app-level-blocs>
+    <counter-bloc-provider>
+      <div>
+        <h1>Blocs demo</h1>
+        <counter-bloc-builder use="color: red;"></counter-bloc-builder>
+      </div>
+    </counter-bloc-provider>
+  </app-level-blocs>
+</app-utils-provider>
       `,
       document.querySelector('#demo')
     );
