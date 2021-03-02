@@ -40,6 +40,13 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         this._configs.useThisBloc.hostElement=this;
       }
     }
+
+    /**
+     * Do not use this to modify the found blocs
+     */
+    public get found_blocs():Record<string,Bloc<any>>{
+      return this._found_blocs;
+    }
     
     public get bloc() : B|undefined {
         return this._bloc;
