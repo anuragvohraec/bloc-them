@@ -10,6 +10,9 @@ If you are familiar with Bloc, then read descriptions of the components this lib
 2. **[lay-them](https://www.npmjs.com/package/lay-them)** to layout your other webcomponents in column, row and stack.
 3. **[route-them](https://www.npmjs.com/package/route-them)** to create routes in your single page application.
 
+## Build instruction
+1. Roll up `npx rollup -c rollup.config.js`
+2. Directly import it into project
 
 ## Pre-requisite for usage
 1. Basic understanding of ES6 classes and inheritance.
