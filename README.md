@@ -148,6 +148,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.1"
+1. Added rollup support. Now the bloc-them lib can be used as a separate JS file too. YOu need to provide external `lit-html` in that case.
+
 ### "version": "5.0.0"
 1. Instead of passing array in BlocsProvider and ReposProvider, we now supply blocsMap and repoMaps , basically javascript object. Keys for this maps are name of the Bloc/Repo and value will be the instance of Blocs. The benefit of this is faster Bloc search.
 2. Blocs now has hostElement attribute, which can be a BlocsProvider or BlocBuilder. This value is set in connection call and hence is not available during constructor phase. This was added as previously we need to supply a html element to find the blocs, now using this we have automated blocs and repos detection.
