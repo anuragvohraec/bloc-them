@@ -13,7 +13,7 @@
   "scripts": {
     "start": "concurrently --kill-others --names tsc,web-dev-server \"npm run tsc:watch\" \"web-dev-server --app-index demo/index.html --node-resolve --open --watch\"",
     "tsc:watch": "tsc --watch",
-    "prepublish": "tsc"
+    "prepublish": "npx rollup -c rollup.config.js"
   },
   "dependencies": {
     "lit-html": "^1.3.0"

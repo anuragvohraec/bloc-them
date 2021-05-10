@@ -1,18 +1,14 @@
 # Bloc-Them
-A Business Logic Component implementation for front end Javascript web components.
+A Business Logic Component implementation for front end Javascript web components.\
+![LOGO](./des/logo.svg)
 
 If you have not heard what is Bloc, then check out the [theory](#theory).\
 If you are familiar with Bloc, then read descriptions of the components this library offers to use Bloc Pattern for your front end development.
 
 # What it can do ?
-1. **[use-them](https://www.npmjs.com/package/use-them)** ready to use webcomponent to create PWA mobile apps GUI.
-0
+1. **[use-them](https://www.npmjs.com/package/use-them)** ready to use webcomponent for creating PWA mobile apps.
 2. **[lay-them](https://www.npmjs.com/package/lay-them)** to layout your other webcomponents in column, row and stack.
 3. **[route-them](https://www.npmjs.com/package/route-them)** to create routes in your single page application.
-
-## Build instruction
-1. Roll up `npx rollup -c rollup.config.js`
-2. Directly import it into project
 
 ## Pre-requisite for usage
 1. Basic understanding of ES6 classes and inheritance.
@@ -26,6 +22,9 @@ For ex:
 ```ts
 
 export class CounterBloc extends Bloc<number>{
+  //this name will be used to search for bloc in the node tree
+  _name="CounterBloc";
+
   constructor(){
       super(0); //passing in initial state as 0;
   }
@@ -60,13 +59,15 @@ And hence bloc is plural in BlocsProvider, as its job is to provide blocs to web
 ```ts
 
 export class CounterBlocProvider extends BlocsProvider{
-constructor(){
-    super([new CounterBloc()]);
-}
+  constructor(){
+      super({
+        CounterBloc:new CounterBloc()
+      });
+  }
 
-builder(){
-    return html`<div><slot></slot></div>`;
-}
+  builder(){
+      return html`<div><slot></slot></div>`;
+  }
 }
 
 //defining the web component
@@ -75,7 +76,7 @@ customElements.define("counter-bloc-provider", CounterBlocProvider);
 
 
 ### **BlocBuilder<B extends Bloc<S\>, S\>**: where S is state and B is Bloc implementation
-This class is to do the actual building of a **[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)**. It has a builder method which can be used to return TemplateResult objects returned by [lit-html](https://lit-html.polymer-project.org/).
+This class do the actual building of a **[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)**. It has a builder method which can be used to return TemplateResult objects returned by [lit-html](https://lit-html.polymer-project.org/).
 ```ts
 
 export class CounterBlocBuilder extends BlocBuilder{
@@ -256,3 +257,6 @@ For example:
 And your GUI uses this state to render out put data. So if the data is incorrect, you exactly know that the Bloc which manages this portion of state of your app, is responsible for this inconsistent behavior.
 
 
+## Build instruction
+1. Roll up `npx rollup -c rollup.config.js`
+2. Directly import it into project
