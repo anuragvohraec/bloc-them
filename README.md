@@ -82,7 +82,7 @@ This class do the actual building of a **[webcomponent](https://developer.mozill
 export class CounterBlocBuilder extends BlocBuilder{
 
 constructor(){
-    super(CounterBloc);
+    super("CounterBloc");//name of the bloc we require for this builder
 }
 
 increment=()=>{
@@ -123,6 +123,10 @@ html`
       `
 ```
 
+In this `counter-bloc-provider` provided the bloc, and `counter-bloc-builder` has encapsulated the GUI buttons, which will use logics provided by the CounterBloc.
+This may seem pretty simple and basic, but it can be used to create very complex applications.
+
+**use-them** is set of webcomponents created on top of bloc-them library. They are ready to use webcomponents for creating mobile apps.
 
 
 
@@ -149,6 +153,10 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.2"
+1. Updated readme . 
+2. Added Logo.
+
 ### "version": "5.0.1"
 1. Added rollup support. Now the bloc-them lib can be used as a separate JS file too. YOu need to provide external `lit-html` in that case.
 
