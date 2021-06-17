@@ -68,7 +68,7 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
                     if(currentEl.bloc?.name === nameOfBlocToSearch){
                         return currentEl.bloc;
                     }else if(currentEl.configs?.blocs_map?.[nameOfBlocToSearch]){
-                        return currentEl.configs?.blocs_map?.[nameOfBlocToSearch] as B;
+                        return currentEl.configs.blocs_map[nameOfBlocToSearch] as B;
                     }
                 }
             }

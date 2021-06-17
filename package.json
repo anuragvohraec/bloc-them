@@ -11,8 +11,6 @@
     "url": "git+https://github.com/anuragvohraec/bloc-them.git"
   },
   "scripts": {
-    "start": "concurrently --kill-others --names tsc,web-dev-server \"npm run tsc:watch\" \"web-dev-server --app-index demo/index.html --node-resolve --open --watch\"",
-    "tsc:watch": "tsc --watch",
     "build": "npx rollup -c rollup.config.js",
     "dev": "cd dist/ && ws --port 3001"
   },
@@ -22,7 +20,6 @@
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.2.1",
     "@types/node": "13.11.1",
-    "@web/dev-server": "^0.0.12",
     "concurrently": "^5.1.0",
     "rollup": "^2.47.0",
     "rollup-plugin-terser": "^7.0.2",

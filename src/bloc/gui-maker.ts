@@ -11,7 +11,7 @@ export interface GuiMakerConfig<S>{
     tag_name:string;
     builder_function:StateBuilderFunction<S>;
     bloc_name:string;
-    blocs_map:Record<string,Bloc<any>>;
+    blocs_map?:Record<string,Bloc<any>>;
     buildWhen?: BuildWhenFunction<S>;
 }
 
@@ -47,8 +47,8 @@ export class GuiMaker{
 
     let tag_name = this.tag_name_from_config(config);
 
-    if(!customElements.get(config.tag_name)){
-        customElements.define(config.tag_name,InnerBuilderClass);
+    if(!customElements.get(tag_name)){
+        customElements.define(tag_name,InnerBuilderClass);
     }
 
     return tag_name;
