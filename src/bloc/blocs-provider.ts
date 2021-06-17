@@ -21,7 +21,7 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
      * 
      * @param _blocsMap case sensitive keys.
      */
-    constructor(private _blocsMap:Record<string,Bloc<any>>){
+    constructor(private _blocsMap:Record<string,Bloc<any>>={}){
         super();
         for(let bn of Object.keys(this._blocsMap)){
             const bloc = this._blocsMap[bn];
@@ -45,6 +45,17 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
     }
 
     static of<B extends Bloc<any>>(nameOfBlocToSearch:string, startingElement:HTMLElement, otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): B|undefined{
+        return this.search(nameOfBlocToSearch,startingElement,otherSearchCriteria);
+    }
+
+    /**
+     * Added this method as its more logicaly named. 
+     * @param nameOfBlocToSearch 
+     * @param startingElement 
+     * @param otherSearchCriteria 
+     * @returns 
+     */
+    static search<B extends Bloc<any>>(nameOfBlocToSearch:string, startingElement:HTMLElement, otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): B|undefined{
         let currentEl: HTMLElement|null = startingElement;
         while(currentEl){
             if(otherSearchCriteria(currentEl)){
@@ -53,8 +64,12 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
                     if(found_bloc){
                         return found_bloc as B;
                     }
-                } else if(currentEl instanceof BlocBuilder && currentEl.bloc?.name === nameOfBlocToSearch){
-                    return currentEl.bloc;
+                } else if(currentEl instanceof BlocBuilder){
+                    if(currentEl.bloc?.name === nameOfBlocToSearch){
+                        return currentEl.bloc;
+                    }else if(currentEl.configs?.blocs_map?.[nameOfBlocToSearch]){
+                        return currentEl.configs?.blocs_map?.[nameOfBlocToSearch] as B;
+                    }
                 }
             }
             let t: HTMLElement|null = currentEl.parentNode as HTMLElement;

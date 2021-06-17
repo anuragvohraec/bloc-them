@@ -5,39 +5,56 @@ import {BaseBlocsHTMLElement} from '../base';
 import {_setDependenciesForABloc} from '../utils';
 
 
-interface BuildWhenFunction<S>{
+export interface BuildWhenFunction<S>{
     (previousState: S, newState: S): boolean;
 }
 
 export interface BlocBuilderConfig<B extends Bloc<S>, S>{
+  /**
+   * @deprecated Use blocs_map instead
+   */
   useThisBloc?:B;
   buildWhen?: BuildWhenFunction<S>;
   otherSearchCriteria?: OtherBlocSearchCriteria;
   search_blocs?:string[];
+  blocs_map?:Record<string,Bloc<any>>
 }
 
 export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLElement{
     private _bloc: B|undefined;
     private _subscriptionId!: string;
     private _prevState!: S;
-    private _configs: BlocBuilderConfig<B,S>;
     private _found_blocs:Record<string,Bloc<any>>={};
-  
-    constructor(protected nameOfBlocToSearch:string, configs?: BlocBuilderConfig<B,S>){
+    
+    static stateChangeBuildWhenFunction<S>(preState: S, newState:S){
+      if(newState!==preState){
+        return true;
+      }else{
+          return false;
+      }
+    }
+
+    constructor(protected nameOfBlocToSearch:string,public configs?: BlocBuilderConfig<B,S>){
       super();
-      let defaultConfig: BlocBuilderConfig<B,S>={
-        buildWhen: (preState: S, newState:S)=>{
-          if(newState!==preState){
-              return true;
-          }else{
-              return false;
-          }
-        }
+
+      if(!this.configs){
+        this.configs={};
       }
 
-      this._configs={...defaultConfig, ...configs};
-      if(this._configs.useThisBloc){
-        this._configs.useThisBloc.hostElement=this;
+      if(!this.configs.buildWhen){
+        this.configs.buildWhen = BlocBuilder.stateChangeBuildWhenFunction;
+      }
+      if(this.configs.useThisBloc){
+        this.configs.useThisBloc.hostElement=this;
+        this._bloc = this.configs.useThisBloc; 
+      }
+      if(this.configs.blocs_map){
+        for(let k of Object.keys(this.configs.blocs_map)){
+          this.configs.blocs_map[k].hostElement=this;
+          if(k === this.nameOfBlocToSearch){
+            this._bloc = this.configs.blocs_map[k] as B;
+          }
+        }
       }
     }
 
@@ -62,15 +79,15 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     connectedCallback(){
       this._initialize();
       //finding and setting search blocs
-      if(!this._configs.search_blocs){
-        this._configs.search_blocs=[];
+      if(!this.configs!.search_blocs){
+        this.configs!.search_blocs=[];
       }
 
       _setDependenciesForABloc(this.bloc!,this);
 
-      this._configs.search_blocs.push(this.nameOfBlocToSearch);
+      this.configs!.search_blocs.push(this.nameOfBlocToSearch);
 
-      for(let bn of this._configs.search_blocs){
+      for(let bn of this.configs!.search_blocs){
         const bloc = BlocsProvider.of(bn,this);
         if(!bloc){
           throw `<${this.tagName}> requires bloc: ${bn}! to function!`;
@@ -92,14 +109,16 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
     _initialize(){
       //find the bloc
-      this._bloc = this._configs.useThisBloc ? this._configs.useThisBloc: BlocsProvider.of<B>(this.nameOfBlocToSearch,this,this._configs.otherSearchCriteria);
-
+      if(!this._bloc){
+        this._bloc = this.configs!.useThisBloc ? this.configs!.useThisBloc: BlocsProvider.of<B>(this.nameOfBlocToSearch,this,this.configs!.otherSearchCriteria);
+      }
+      
       //if bloc is found;
       if(this._bloc){
         this._prevState = this._bloc.state;
         const l : PureFunction<S>= (newState: S)=>{
           try{
-            if(this._configs.buildWhen!(this._prevState, newState)){
+            if(this.configs!.buildWhen!(this._prevState, newState)){
               this._build(newState);
               this._prevState = newState;
             }

@@ -153,6 +153,11 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.3"
+1. Added GUI maker
+2. BlocBuilder now has a BlocsMap , so extra blocs can be provided by it too.
+3. BlocsProvider has a default constructor value for the blocs map.
+
 ### "version": "5.0.2"
 1. Updated readme . 
 2. Added Logo.
