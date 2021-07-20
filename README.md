@@ -153,6 +153,11 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.4"
+1. Added Bloc.search static method to search for blocs.
+2. Added search method in repo too.
+3. Marked `of` method for bloc search as deprecated.
+
 ### "version": "5.0.3"
 1. Added GUI maker
 2. BlocBuilder now has a BlocsMap , so extra blocs can be provided by it too.

@@ -26,7 +26,19 @@ export abstract class ReposProvider extends BaseBlocsHTMLElement{
         this._build();
     }
 
+    /**
+     * 
+     * @param repoName 
+     * @param startingElement 
+     * @param otherSearchCriteria 
+     * @returns 
+     * @deprecated Use search instead
+     */
     static of<R extends Repository>(repoName:string, startingElement: HTMLElement,otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): R|undefined{
+        return this.search(repoName,startingElement,otherSearchCriteria);
+    }
+
+    static search<R extends Repository>(repoName:string, startingElement: HTMLElement,otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): R|undefined{
         let currentEl: HTMLElement|null = startingElement;
         while(currentEl){
             if(otherSearchCriteria(currentEl)){

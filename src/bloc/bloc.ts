@@ -1,5 +1,5 @@
 import { HasNameAndHost } from '../base';
-import { BlocsProvider } from './blocs-provider';
+import { BlocsProvider, OtherBlocSearchCriteria } from './blocs-provider';
 import {ReposProvider, Repository} from '../repo/repo-provider';
 
 /**
@@ -48,6 +48,10 @@ export abstract class Bloc<S> extends HasNameAndHost{
     
     public get blocsMap() : Record<string,Bloc<any>> {
       return this._blocsMap;
+    }
+
+    static search<B extends Bloc<any>>(nameOfBlocToSearch:string, startingElement:HTMLElement, otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): B|undefined{
+      return BlocsProvider.search<B>(nameOfBlocToSearch,startingElement,otherSearchCriteria);
     }
     
     getBloc<B extends Bloc<any>>(bloc_name:string){
