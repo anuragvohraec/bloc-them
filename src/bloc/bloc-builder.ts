@@ -163,7 +163,6 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
     subscribed_blocs:string[]
   }){
     super();
-    this.attachShadow({mode:"open"});
     if(this.config.blocs_map){
       for(let k of Object.keys(this.config.blocs_map)){
         this.config.blocs_map[k].hostElement=this;
