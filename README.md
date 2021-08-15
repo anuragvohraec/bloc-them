@@ -153,6 +153,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.5"
+1. Added MultiBlocsReactiveWidget: which can listen to multiple blocs and react to there state change reactively.
+
 ### "version": "5.0.4"
 1. Added Bloc.search static method to search for blocs.
 2. Added search method in repo too.

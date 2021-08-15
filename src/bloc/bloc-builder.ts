@@ -149,3 +149,85 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
     abstract builder(state: S): TemplateResult;
 }
+
+
+export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
+  protected found_blocs:Record<string,Bloc<any>>={};
+  protected state?:S;
+  protected subscribed_states: Record<string, any> = {};
+  private listener_ids:Record<string,string>={}
+    
+
+  constructor(protected config:{
+    blocs_map:Record<string,Bloc<any>>,
+    subscribed_blocs:string[]
+  }){
+    super();
+    this.attachShadow({mode:"open"});
+    if(this.config.blocs_map){
+      for(let k of Object.keys(this.config.blocs_map)){
+        this.config.blocs_map[k].hostElement=this;
+      }
+    }
+  }
+
+  connectedCallback(){
+    if(this.isConnected){
+      for(let bloc_name of this.config.subscribed_blocs){
+        let foundBloc = Bloc.search<Bloc<any>>(bloc_name,this);
+        if(!foundBloc){
+          throw `${this.tagName} depends upon bloc ${bloc_name} , but is not found in the DOM tree`;
+        }else{
+          this.found_blocs[bloc_name] = foundBloc;
+        }
+      }
+
+      //then lets listen for new states
+      //listening to bloc states
+      for(let bloc_name in this.found_blocs){
+        this.subscribed_states[bloc_name]=this.found_blocs[bloc_name].state;
+
+        let t:any = (newState:any)=>{
+          this.subscribed_states={...this.subscribed_states};
+          this.subscribed_states[bloc_name]=newState;
+          this._build();
+        };
+        t._ln_name = this.tagName;
+
+        this.listener_ids[bloc_name]=this.found_blocs[bloc_name]._listen(t);
+      }
+
+      //lets do the first build
+      this._build();
+    }
+  }
+
+  disconnectedCallback(){
+    //stop listening for state change from subscribed blocs
+    for(let bloc_name in this.found_blocs){
+      try{
+        this.found_blocs[bloc_name]._stopListening(this.listener_ids[bloc_name]);
+      }finally{
+        continue;
+      }
+    }
+  }
+
+  abstract convertSubscribedStatesToReactiveState(subscribed_states?: Record<string, any>):S;
+  
+  protected build_when(prev_state?:S,new_state?:S):boolean{
+    return prev_state!==new_state;
+  }
+
+  abstract build(state:S):TemplateResult;
+
+  protected _build(){
+    let newState = this.convertSubscribedStatesToReactiveState(this.subscribed_states);
+
+    if(this.build_when(this.state,newState)){
+        this.state = newState;
+        let gui :TemplateResult = this.build(this.state);
+        render(gui,this.shadowRoot!);
+    }
+  }
+}
