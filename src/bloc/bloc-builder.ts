@@ -213,13 +213,13 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
     }
   }
 
-  abstract convertSubscribedStatesToReactiveState(subscribed_states?: Record<string, any>):S;
+  abstract convertSubscribedStatesToReactiveState(subscribed_states?: Record<string, any>):S|undefined;
   
   protected build_when(prev_state?:S,new_state?:S):boolean{
     return prev_state!==new_state;
   }
 
-  abstract build(state:S):TemplateResult;
+  abstract build(state?:S):TemplateResult;
 
   protected _build(){
     let newState = this.convertSubscribedStatesToReactiveState(this.subscribed_states);
