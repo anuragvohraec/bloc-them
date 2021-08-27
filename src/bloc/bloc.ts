@@ -53,6 +53,11 @@ export abstract class Bloc<S> extends HasNameAndHost{
     static search<B extends Bloc<any>>(nameOfBlocToSearch:string, startingElement:HTMLElement, otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): B|undefined{
       return BlocsProvider.search<B>(nameOfBlocToSearch,startingElement,otherSearchCriteria);
     }
+
+    public onConnection(ctx:HTMLElement){
+      this.hostElement=ctx;
+    }
+    public onDisconnection(){}
     
     getBloc<B extends Bloc<any>>(bloc_name:string){
       let b:Bloc<any>|undefined = this._blocsMap[bloc_name];

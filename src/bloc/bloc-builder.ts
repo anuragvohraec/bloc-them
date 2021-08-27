@@ -95,6 +95,13 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
           this._found_blocs[bn]=bloc;
         }
       }
+
+      this.bloc?.onConnection(this);
+      if(this.configs?.blocs_map){
+        for(let b in this.configs.blocs_map){
+          this.configs.blocs_map[b].onConnection(this);
+        }
+      }
     }
 
     getBloc<B extends Bloc<any>>(bn:string):B{
@@ -139,6 +146,13 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     }
   
     disconnectedCallback(){
+      this.bloc?.onDisconnection();
+      if(this.configs?.blocs_map){
+        for(let b in this.configs.blocs_map){
+          this.configs.blocs_map[b].onDisconnection();
+        }
+      }
+
       this._bloc!._stopListening(this._subscriptionId);
     }
     
@@ -198,10 +212,22 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
 
       //lets do the first build
       this._build();
+      
+      if(this.config.blocs_map){
+        for(let b in this.config.blocs_map){
+          this.config.blocs_map[b].onConnection(this);
+        }
+      }
     }
   }
 
   disconnectedCallback(){
+    if(this.config.blocs_map){
+      for(let b in this.config.blocs_map){
+        this.config.blocs_map[b].onDisconnection();
+      }
+    }
+
     //stop listening for state change from subscribed blocs
     for(let bloc_name in this.found_blocs){
       try{

@@ -42,6 +42,20 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
             const bloc = this._blocsMap[bloc_name];
             _setDependenciesForABloc(bloc,this);
         }
+
+        if(this._blocsMap){
+            for(let b in this._blocsMap){
+              this._blocsMap[b].onConnection(this);
+            }
+        }
+    }
+
+    disconnectedCallback(){
+        if(this._blocsMap){
+            for(let b in this.blocsMap){
+                this.blocsMap[b].onDisconnection();
+            }
+        }
     }
 
     /**
