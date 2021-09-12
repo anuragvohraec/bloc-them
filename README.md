@@ -153,6 +153,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.8"
+1. Bug fixes: BlocBuilder was triggering incorrect onConnection calls
+
 ### "version": "5.0.5"
 1. Added MultiBlocsReactiveWidget: which can listen to multiple blocs and react to there state change reactively.
 

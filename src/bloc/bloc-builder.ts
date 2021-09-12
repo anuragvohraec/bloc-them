@@ -96,7 +96,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         }
       }
 
-      this.bloc?.onConnection(this);
+      this.configs?.useThisBloc?.onConnection(this);
       if(this.configs?.blocs_map){
         for(let b in this.configs.blocs_map){
           this.configs.blocs_map[b].onConnection(this);
