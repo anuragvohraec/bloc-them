@@ -153,6 +153,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.9"
+1. Bug fixes: BlocBuilder was triggering incorrect onDisconnection calls
+
 ### "version": "5.0.8"
 1. Bug fixes: BlocBuilder was triggering incorrect onConnection calls
 

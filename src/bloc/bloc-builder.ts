@@ -146,7 +146,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     }
   
     disconnectedCallback(){
-      this.bloc?.onDisconnection();
+      this.configs?.useThisBloc?.onDisconnection();
       if(this.configs?.blocs_map){
         for(let b in this.configs.blocs_map){
           this.configs.blocs_map[b].onDisconnection();
