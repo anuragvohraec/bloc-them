@@ -153,6 +153,9 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "5.0.10"
+1. Bug fixes: MultiBlocsReactiveWidget. while searching for blocs it was not taking it in consideration.
+
 ### "version": "5.0.9"
 1. Bug fixes: BlocBuilder was triggering incorrect onDisconnection calls
 

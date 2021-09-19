@@ -1,6 +1,6 @@
 import { Bloc } from "./bloc";
 import { render, TemplateResult } from "lit-html";
-import { BlocBuilder } from "./bloc-builder";
+import { BlocBuilder, MultiBlocsReactiveWidget } from "./bloc-builder";
 import {BaseBlocsHTMLElement} from '../base';
 import {_setDependenciesForABloc} from '../utils';
 
@@ -91,6 +91,11 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
                         return currentEl.bloc;
                     }else if(currentEl.configs?.blocs_map?.[nameOfBlocToSearch]){
                         return currentEl.configs.blocs_map[nameOfBlocToSearch] as B;
+                    }
+                }else if(currentEl instanceof MultiBlocsReactiveWidget){
+                    let foundBloc = currentEl.blocsMap[nameOfBlocToSearch];
+                    if(foundBloc){
+                        return foundBloc as B;
                     }
                 }
             }

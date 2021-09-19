@@ -170,7 +170,12 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
   protected state?:S;
   protected subscribed_states: Record<string, any> = {};
   private listener_ids:Record<string,string>={}
-    
+  
+  
+  public get blocsMap() : Record<string,Bloc<any>> {
+    return this.config.blocs_map;
+  }
+  
 
   constructor(protected config:{
     blocs_map:Record<string,Bloc<any>>,
