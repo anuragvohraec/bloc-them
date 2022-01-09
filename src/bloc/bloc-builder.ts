@@ -3,6 +3,7 @@ import { TemplateResult, render } from "lit-html";
 import {BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
 import {_setDependenciesForABloc} from '../utils';
+import { config } from "process";
 
 
 export interface BuildWhenFunction<S>{
@@ -35,12 +36,36 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       }
     }
 
+    public configs:BlocBuilderConfig<B,S>;
+
+    public set blocBuilderConfig(bConfig:BlocBuilderConfig<B,S>){
+      if(bConfig.buildWhen){
+        this.configs.buildWhen=bConfig.buildWhen;
+      }
+      if(bConfig.otherSearchCriteria){
+        this.configs.otherSearchCriteria=bConfig.otherSearchCriteria;
+      }
+
+      //merges new config onto old config
+      if(bConfig.blocs_map){
+        if(!this.configs.blocs_map){
+          this.configs.blocs_map={};
+        }
+        this.configs.blocs_map={...this.configs.blocs_map,...bConfig.blocs_map};
+
+        if(bConfig.blocs_map[this.nameOfBlocToSearch]){
+          this._bloc = this.configs.blocs_map[this.nameOfBlocToSearch] as B;
+          this._build(this._bloc.state);
+        }
+      }
+    }
+
     /**
      * 
      * @param nameOfBlocToSearch Either provide this or provide bloc attribute
      * @param configs 
      */
-    constructor(nameOfBlocToSearch?:string,public configs?: BlocBuilderConfig<B,S>){
+    constructor(nameOfBlocToSearch?:string,configs?: BlocBuilderConfig<B,S>){
       super();
       
       const userSuggestedBlocName = this.getAttribute("bloc");
@@ -52,8 +77,10 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
       this.nameOfBlocToSearch= nameOfBlocToSearch;
 
-      if(!this.configs){
+      if(!configs){
         this.configs={};
+      }else{
+        this.configs=configs;
       }
 
       if(!this.configs.buildWhen){
@@ -84,19 +111,19 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         return this._bloc;
     }
 
-    public set addBloc(bloc:Bloc<any>){
-        if(!this.configs){
-          this.configs={}
-        }
-        if(!this.configs.blocs_map){
-          this.configs.blocs_map={};
-        }
-        this.configs.blocs_map[bloc.name]=bloc;
-        if(this.nameOfBlocToSearch === bloc.name){
-          this._bloc = bloc as B;
-          this._build(this._bloc.state);
-        }
-    }
+    // public set addBloc(bloc:Bloc<any>){
+    //     if(!this.configs){
+    //       this.configs={}
+    //     }
+    //     if(!this.configs.blocs_map){
+    //       this.configs.blocs_map={};
+    //     }
+    //     this.configs.blocs_map[bloc.name]=bloc;
+    //     if(this.nameOfBlocToSearch === bloc.name){
+    //       this._bloc = bloc as B;
+    //       this._build(this._bloc.state);
+    //     }
+    // }
 
     
     public get state() : S|undefined {
