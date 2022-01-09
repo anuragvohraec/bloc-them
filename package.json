@@ -1,6 +1,6 @@
 {
   "name": "bloc-them",
-  "version": "5.0.11",
+  "version": "5.0.12",
   "description": "Lit-Html powered BLoc system for creating Javascript based UI.",
   "author": "bloc-them",
   "license": "MIT",
