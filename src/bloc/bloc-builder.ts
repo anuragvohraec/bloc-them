@@ -84,6 +84,20 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         return this._bloc;
     }
 
+    public set addBloc(bloc:Bloc<any>){
+        if(!this.configs){
+          this.configs={}
+        }
+        if(!this.configs.blocs_map){
+          this.configs.blocs_map={};
+        }
+        this.configs.blocs_map[bloc.name]=bloc;
+        if(this.nameOfBlocToSearch === bloc.name){
+          this._bloc = bloc as B;
+          this._build(this._bloc.state);
+        }
+    }
+
     
     public get state() : S|undefined {
       return this.bloc?.state;

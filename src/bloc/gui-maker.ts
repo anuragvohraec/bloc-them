@@ -1,4 +1,4 @@
-import { html, TemplateResult } from "lit-html";
+import { html, nothing, TemplateResult } from "lit-html";
 import { Bloc } from "./bloc";
 import { BlocBuilder,BuildWhenFunction} from "./bloc-builder";
 import {unsafeHTML} from 'lit-html/directives/unsafe-html';
@@ -54,3 +54,29 @@ export class GuiMaker{
     return tag_name;
    }
 }
+
+export abstract class ApexBloc extends Bloc<TemplateResult>{
+    constructor(initState?:TemplateResult){
+        super(initState??nothing as TemplateResult);
+    }
+    abstract notifyAttributeChange<T>(newValue:T):void;
+}
+
+class ApexWidgetBuilder extends BlocBuilder<ApexBloc,TemplateResult>{
+    private _prop: any;
+
+    public get prop(): any {
+        return this._prop;
+    }
+    public set prop(value: any) {
+        this._prop = value;
+        if(value){
+            this.bloc?.notifyAttributeChange(value);
+        }
+    }
+
+    builder(state: TemplateResult): TemplateResult {
+        return state;
+    }
+}
+customElements.define("bt-apex",ApexWidgetBuilder);
