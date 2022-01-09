@@ -25,7 +25,8 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     private _subscriptionId!: string;
     private _prevState!: S;
     private _found_blocs:Record<string,Bloc<any>>={};
-    
+    protected nameOfBlocToSearch:string;
+
     static stateChangeBuildWhenFunction<S>(preState: S, newState:S){
       if(newState!==preState){
         return true;
@@ -34,8 +35,22 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       }
     }
 
-    constructor(protected nameOfBlocToSearch:string,public configs?: BlocBuilderConfig<B,S>){
+    /**
+     * 
+     * @param nameOfBlocToSearch Either provide this or provide bloc attribute
+     * @param configs 
+     */
+    constructor(nameOfBlocToSearch?:string,public configs?: BlocBuilderConfig<B,S>){
       super();
+      
+      const userSuggestedBlocName = this.getAttribute("bloc");
+      nameOfBlocToSearch=userSuggestedBlocName?userSuggestedBlocName:nameOfBlocToSearch;
+
+      if(!nameOfBlocToSearch){
+        throw `No bloc name provided for: ${this.tagName}`;
+      }
+
+      this.nameOfBlocToSearch= nameOfBlocToSearch;
 
       if(!this.configs){
         this.configs={};
