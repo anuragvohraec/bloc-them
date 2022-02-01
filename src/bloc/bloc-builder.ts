@@ -232,6 +232,16 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
     return this.config.blocs_map;
   }
   
+  public getBloc<B extends Bloc<any>>(blocName:string):B{
+      let result = this.blocsMap[blocName] as B;
+      if(!result){
+        result=this.found_blocs[blocName] as B;
+        if(!result){
+          result=BlocsProvider.search<B>(blocName,this) as B;
+        }
+      }
+      return result;
+  }
 
   constructor(protected config:{
     blocs_map:Record<string,Bloc<any>>,
