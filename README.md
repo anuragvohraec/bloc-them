@@ -15,116 +15,10 @@ If you are familiar with Bloc, then read descriptions of the components this lib
 3. Basic knowledge of [lit-html](https://lit-html.polymer-project.org/).
 
 ## Important Classes and uses
-
-### **Bloc<S\>**: where S is state of your app you are trying to control
-Bloc class where in you will implement the non gui business logic.
-For ex:
-```ts
-
-export class CounterBloc extends Bloc<number>{
-  //this name will be used to search for bloc in the node tree
-  _name="CounterBloc";
-
-  constructor(){
-      super(0); //passing in initial state as 0;
-  }
-
-  //emit is used to give new states of your app.
-
-//increment increases the sate your app by 1 and then emits the new state, so that all other GUI components, which depends on this count can re-render themselves to this new state.
-  increment(){
-      let n = this.state;
-      n++;
-      this.emit(n);
-  }
-
-//decrement decreases the state and then emit this new state.
-  decrement(){
-      let n = this.state;
-      n--;
-      this.emit(n);
-  }
-}
-```
-The above bloc tries to manage count state of your app.
-
-You can create various such bloc to control other aspects of overall state of your app.
-And then create methods on this blocs to, which will modify state and then call emit to publish this new state.
-
-### **BlocsProvider**
-This class is a **[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)**, which aims to provide blocs to other components of your app.
-**One BlocsProvider can provide multiple types of blocs** to all its children in the DOM tree.
-And hence bloc is plural in BlocsProvider, as its job is to provide blocs to webcomponents below this.
-
-```ts
-
-export class CounterBlocProvider extends BlocsProvider{
-  constructor(){
-      super({
-        CounterBloc:new CounterBloc()
-      });
-  }
-
-  builder(){
-      return html`<div><slot></slot></div>`;
-  }
-}
-
-//defining the web component
-customElements.define("counter-bloc-provider", CounterBlocProvider);
-```
-
-
-### **BlocBuilder<B extends Bloc<S\>, S\>**: where S is state and B is Bloc implementation
-This class do the actual building of a **[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)**. It has a builder method which can be used to return TemplateResult objects returned by [lit-html](https://lit-html.polymer-project.org/).
-```ts
-
-export class CounterBlocBuilder extends BlocBuilder{
-
-constructor(){
-    super("CounterBloc");//name of the bloc we require for this builder
-}
-
-increment=()=>{
-  this.bloc.increment();
-}
-
-decrement=()=>{
-  this.bloc.decrement();
-}
-
-builder(state){
-    let color = this.useAttribute["color"];
-    return html`
-    <div style="color: ${color}">Current state is : ${state}</div>
-    <div><button @click=${this.increment}>increment</button></div>
-    <div><button @click=${this.decrement}>decrement</button></div>
-    `;
-}
-}
-
-//defining the web component
-customElements.define("counter-bloc-builder", CounterBlocBuilder);
-```
-BlocBuilder constructor also can be provided with a BlocBuilderConfig, which has a parameter **useThisBloc**.
-which can be used to provide a bloc directly, without for the need for BlocsProvider to provide it.
-
-
-Now after defining bloc, blocs provider and bloc builder you can use, this as like this in HTML.
-```
-//lit-html tag
-html`
-  <counter-bloc-provider>
-    <div>
-      <h1>Blocs demo</h1>
-      <counter-bloc-builder use="color: red;"></counter-bloc-builder>
-    </div>
-  </counter-bloc-provider>
-      `
-```
-
-In this `counter-bloc-provider` provided the bloc, and `counter-bloc-builder` has encapsulated the GUI buttons, which will use logics provided by the CounterBloc.
-This may seem pretty simple and basic, but it can be used to create very complex applications.
+### Bloc<S> Business Logic component which control one type of State.
+### BlocsProvider an HTMLElement webcomponent which provided blocs to items inside its DOM Hierarchy.
+### BlocBuilder an HTMLElement webcomponent which can listen to states from a single bloc and react to state changes from it.
+### MultiBlocsReactiveWidget an HTMLElement webcomponent which can listen to states from various bloc simultaneously and react to state changes from each one of them.
 
 **use-them** is set of webcomponents created on top of bloc-them library. They are ready to use webcomponents for creating mobile apps.
 
@@ -153,6 +47,12 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": "6.0.0"
+1. Deprecated concept of Repository and RepoProvider. Use Blocs provider instead. Repo Provider had no significance, and has been marked as deprecated long back
+2. Bloc now can subscribe to other blocs , by passing listenToBlocs array. Whenever state of this parent bloc changes they will call reactToStateChangeFrom(blocName,newState) on this bloc
+3. Bloc.onConnection gets called right after the host HTMLElement has connected to the DOM tree.
+4. Overall many minute changes.
+
 ### "version": "5.0.12"
 1. Added `bt-apex`. Usage examples:
 ```html
