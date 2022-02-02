@@ -2,7 +2,6 @@ import { Bloc } from "./bloc";
 import { render, TemplateResult } from "lit-html";
 import { BlocBuilder, MultiBlocsReactiveWidget } from "./bloc-builder";
 import {BaseBlocsHTMLElement} from '../base';
-import {_setDependenciesForABloc} from '../utils';
 
 // export  interface BlocType< B extends Bloc<S>,S>{
 //     new(...args: any[]): B
@@ -38,14 +37,11 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
 
     connectedCallback(){
         this._build();
-        for(let bloc_name of Object.keys(this._blocsMap)){
-            const bloc = this._blocsMap[bloc_name];
-            _setDependenciesForABloc(bloc,this);
-        }
-
         if(this._blocsMap){
             for(let b in this._blocsMap){
-              this._blocsMap[b].onConnection(this);
+              setImmediate(()=>{
+                this._blocsMap[b].onConnection(this);
+              });
             }
         }
     }
@@ -75,7 +71,7 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
                         return found_bloc as B;
                     }
                 } else if(currentEl instanceof BlocBuilder){
-                    if(currentEl.bloc?.name === nameOfBlocToSearch){
+                    if(currentEl.blocName === nameOfBlocToSearch){
                         return currentEl.bloc;
                     }else if(currentEl.configs?.blocs_map?.[nameOfBlocToSearch]){
                         return currentEl.configs.blocs_map[nameOfBlocToSearch] as B;

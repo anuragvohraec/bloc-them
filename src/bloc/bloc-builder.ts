@@ -2,8 +2,6 @@ import { Bloc, PureFunction } from "./bloc";
 import { TemplateResult, render } from "lit-html";
 import {BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
-import {_setDependenciesForABloc} from '../utils';
-
 
 export interface BuildWhenFunction<S>{
     (previousState: S, newState: S): boolean;
@@ -12,7 +10,6 @@ export interface BuildWhenFunction<S>{
 export interface BlocBuilderConfig<S>{
   buildWhen?: BuildWhenFunction<S>;
   otherSearchCriteria?: OtherBlocSearchCriteria;
-  search_blocs?:string[];
   blocs_map?:Record<string,Bloc<any>>
 }
 
@@ -20,8 +17,11 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     private _bloc: B|undefined;
     private _subscriptionId!: string;
     private _prevState!: S;
-    private _found_blocs:Record<string,Bloc<any>>={};
     protected nameOfBlocToSearch:string;
+
+    get blocName():string{
+      return this.nameOfBlocToSearch;
+    }
 
     static stateChangeBuildWhenFunction<S>(preState: S, newState:S){
       if(newState!==preState){
@@ -92,31 +92,10 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       }
     }
 
-    /**
-     * Do not use this to modify the found blocs
-     */
-    public get found_blocs():Record<string,Bloc<any>>{
-      return this._found_blocs;
-    }
     
     public get bloc() : B|undefined {
         return this._bloc;
     }
-
-    // public set addBloc(bloc:Bloc<any>){
-    //     if(!this.configs){
-    //       this.configs={}
-    //     }
-    //     if(!this.configs.blocs_map){
-    //       this.configs.blocs_map={};
-    //     }
-    //     this.configs.blocs_map[bloc.name]=bloc;
-    //     if(this.nameOfBlocToSearch === bloc.name){
-    //       this._bloc = bloc as B;
-    //       this._build(this._bloc.state);
-    //     }
-    // }
-
     
     public get state() : S|undefined {
       return this.bloc?.state;
@@ -124,40 +103,21 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     
     
 
-    connectedCallback(){
+    protected connectedCallback(){
       this._initialize();
-      //finding and setting search blocs
-      if(!this.configs!.search_blocs){
-        this.configs!.search_blocs=[];
-      }
-
-      _setDependenciesForABloc(this.bloc!,this);
-
-      this.configs!.search_blocs.push(this.nameOfBlocToSearch);
-
-      for(let bn of this.configs!.search_blocs){
-        const bloc = BlocsProvider.search(bn,this);
-        if(!bloc){
-          throw `<${this.tagName}> requires bloc: ${bn}! to function!`;
-        }else{
-          this._found_blocs[bn]=bloc;
-        }
-      }
 
       if(this.configs?.blocs_map){
         for(let b in this.configs.blocs_map){
-          this.configs.blocs_map[b].onConnection(this);
+          const bloc= this.configs.blocs_map[b];
+          setImmediate(()=>{
+            bloc.onConnection(this);
+          })
         }
       }
     }
 
-    getBloc<B extends Bloc<any>>(bn:string):B{
-      const b = this._found_blocs[bn] as B;
-      if(!b){
-        throw `<${this.tagName}> requires bloc: ${bn}! to function!`;
-      }else{
-        return b;
-      }
+    getBloc<B extends Bloc<any>>(bn:string){
+      return BlocsProvider.search<B>(bn,this);
     }
     
 
@@ -185,7 +145,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         if(this.id){
           l._ln_name+=`#${this.id}`;
         }
-        this._subscriptionId = this._bloc._listen(l);
+        this._subscriptionId = this._bloc._subscribe(l);
         this._build(this._prevState);
       }else{
         throw `No parent found which has ${this.nameOfBlocToSearch} bloc`;
@@ -199,7 +159,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         }
       }
 
-      this._bloc!._stopListening(this._subscriptionId);
+      this._bloc!._unsubscribe(this._subscriptionId);
     }
     
     _build(state: S){
@@ -268,7 +228,7 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
         };
         t._ln_name = this.tagName;
 
-        this.listener_ids[bloc_name]=this.found_blocs[bloc_name]._listen(t);
+        this.listener_ids[bloc_name]=this.found_blocs[bloc_name]._subscribe(t);
       }
 
       //lets do the first build
@@ -276,7 +236,10 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
       
       if(this.config.blocs_map){
         for(let b in this.config.blocs_map){
-          this.config.blocs_map[b].onConnection(this);
+          let bloc=this.config.blocs_map[b];
+          setImmediate(()=>{
+            bloc.onConnection(this);
+          })
         }
       }
     }
@@ -292,7 +255,7 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
     //stop listening for state change from subscribed blocs
     for(let bloc_name in this.found_blocs){
       try{
-        this.found_blocs[bloc_name]._stopListening(this.listener_ids[bloc_name]);
+        this.found_blocs[bloc_name]._unsubscribe(this.listener_ids[bloc_name]);
       }finally{
         continue;
       }

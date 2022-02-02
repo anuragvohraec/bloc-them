@@ -15,11 +15,6 @@ interface _PureFunctionMap<S>{
 [key: string]: PureFunction<S>;
 }
 
-interface BlocDependencies{
-  blocs?:string[];
-  repos?:string[];
-}
-
 export function deepFreeze(obj:any){
   Object.keys(obj).forEach(prop => {
     if (typeof obj[prop] === 'object' && !Object.isFrozen(obj[prop])) deepFreeze(obj[prop]);
@@ -46,11 +41,58 @@ export abstract class Bloc<S> extends HasNameAndHost{
       return BlocsProvider.search<B>(nameOfBlocToSearch,startingElement,otherSearchCriteria);
     }
 
+    /**
+     * key is bloc name
+     */
+    protected foundListenedBlocs:Record<string,{bloc:Bloc<any>,subscriber_id:string}>={};
+  
+    /**
+     * Called right after an HTMLElement is connected
+     * @param ctx 
+     */
     public onConnection(ctx:HTMLElement){
       this.hostElement=ctx;
+      for(let b of this.listenToBlocs){
+          let fb = Bloc.search(b,this.hostElement);
+          if(!fb){
+            this.foundListenedBlocs={};
+            throw `${this._name.toUpperCase()} hosted on ${ctx.tagName} depends upon ${b} bloc, which is not found the parent DOMs!`
+          }
+          this.foundListenedBlocs[b]={
+            bloc:fb,
+            subscriber_id:""
+          };
+      }
+
+      //now lets listen to them
+      for(let b of Object.keys(this.foundListenedBlocs)){
+          let t:any = (newState:any)=>{
+              this.reactToStateChangeFrom(b,newState);
+          };
+          t._ln_name=b;
+          this.foundListenedBlocs[b].subscriber_id=this.foundListenedBlocs[b].bloc._subscribe(t);
+      }
     }
-    public onDisconnection(){}
+
+    /**
+     * Called before disconnection of HTMLElement
+     */
+    public onDisconnection(){
+      //stop listening
+      for(let b of Object.keys(this.foundListenedBlocs)){
+        this.foundListenedBlocs[b].bloc._unsubscribe(this.foundListenedBlocs[b].subscriber_id);
+      }
+    }
     
+    /**
+     * Override 
+     * @param blocName 
+     * @param newState 
+     */
+    protected reactToStateChangeFrom(blocName:string,newState:any){
+
+    }
+
     getBloc<B extends Bloc<any>>(bloc_name:string){
       let b:Bloc<any>|undefined = this._blocsMap[bloc_name];
       if(!b){
@@ -68,15 +110,12 @@ export abstract class Bloc<S> extends HasNameAndHost{
     /**
      * 
      * @param initState this is mostly used for rendering loading place holder [grey boxes].
-     * @param blocDependencies  this are searched after their host has connected: during the connected callBack.
-     * There for ths dependencies will not be available in the constructor and must not be called in the constructor phase of the bloc.
+     * @param listenToBlocs onConnection of this bloc's host element, this bloc will start subscribe to state change from this blocs (present in the parent chain).
+     * If a bloc is not found it will throw error
      */
-    constructor(protected initState: S,public blocDependencies?:BlocDependencies){
+    constructor(protected initState: S,protected listenToBlocs:string[]=[]){
         super();
         this._state=initState;
-        if(this.blocDependencies){
-          deepFreeze(this.blocDependencies);
-        }
     }
 
     
@@ -107,7 +146,7 @@ export abstract class Bloc<S> extends HasNameAndHost{
     * 
     * @param aPureFunction Used to subscribe to state changes
     */
-   _listen(aPureFunction: PureFunction<S>): string{
+   _subscribe(aPureFunction: PureFunction<S>): string{
     let key: string = `${this._listener_id_ref}`;
     this._listeners[key]=aPureFunction;
     this._listener_id_ref++;
@@ -118,7 +157,7 @@ export abstract class Bloc<S> extends HasNameAndHost{
    * 
    * @param listeningId Unsubscribe to state listening state changes
    */
-  _stopListening(listeningId: string): void{
+  _unsubscribe(listeningId: string): void{
     if(listeningId && this._listeners[listeningId]){
       delete this._listeners[listeningId];
     }
