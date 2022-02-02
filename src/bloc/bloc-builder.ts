@@ -133,22 +133,24 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       //if bloc is found;
       if(this._bloc){
         this._prevState = this._bloc.state;
-        const l : PureFunction<S>= (newState: S)=>{
-          try{
-            if(this._blocBuilderConfig!.buildWhen!(this._prevState, newState)){
-              this._build(newState);
-              this._prevState = newState;
+
+        const listenerForNewState : PureFunction<S>= (newState: S)=>{
+            try{
+              if(this._blocBuilderConfig!.buildWhen!(this._prevState, newState)){
+                this._build(newState);
+                this._prevState = newState;
+              }
+            }catch(e){
+              console.error(`${listenerForNewState._ln_name} listener function has caught an error. Which mostly happens when your builder function is throwing error, which is not what should be done/happen!`);
+              console.error(e);
             }
-          }catch(e){
-            console.error(`${l._ln_name} listener function has caught an error. Which mostly happens when your builder function is throwing error, which is not what should be done/happen!`);
-            console.error(e);
-          }
-      };
-        l._ln_name = this.tagName;
+        };
+        listenerForNewState._ln_name = this.tagName;
         if(this.id){
-          l._ln_name+=`#${this.id}`;
+          listenerForNewState._ln_name+=`#${this.id}`;
         }
-        this._subscriptionId = this._bloc._subscribe(l);
+
+        this._subscriptionId = this._bloc._subscribe(listenerForNewState);
         this._build(this._prevState);
       }else{
         throw `[BLOC-THEM] : No parent found which has ${this.nameOfBlocToSearch} bloc`;
@@ -201,11 +203,6 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
     subscribed_blocs:string[]
   }){
     super();
-    if(this.config.blocs_map){
-      for(let k of Object.keys(this.config.blocs_map)){
-        this.config.blocs_map[k].hostElement=this;
-      }
-    }
   }
 
   connectedCallback(){
