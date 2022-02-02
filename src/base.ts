@@ -1,7 +1,3 @@
-import { Bloc } from './bloc/bloc';
-import { BlocsProvider } from './bloc/blocs-provider';
-import { ReposProvider } from './repo/repo-provider';
-
 export interface BlocThemUseAttribute{
     [key:string]:string;
 }

@@ -59,18 +59,6 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
     }
 
     /**
-     * 
-     * @param nameOfBlocToSearch 
-     * @param startingElement 
-     * @param otherSearchCriteria 
-     * @returns 
-     * @deprecated Use search instead
-     */
-    static of<B extends Bloc<any>>(nameOfBlocToSearch:string, startingElement:HTMLElement, otherSearchCriteria: OtherBlocSearchCriteria=(currentEl: HTMLElement)=>true): B|undefined{
-        return this.search(nameOfBlocToSearch,startingElement,otherSearchCriteria);
-    }
-
-    /**
      * Added this method as its more logicaly named. 
      * @param nameOfBlocToSearch 
      * @param startingElement 

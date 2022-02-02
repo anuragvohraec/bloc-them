@@ -1,24 +1,13 @@
 import { Bloc } from './bloc/bloc';
 import { BlocsProvider } from './bloc/blocs-provider';
-import { ReposProvider } from './repo/repo-provider';
 
 export function _setDependenciesForABloc(forBloc: Bloc<any>, context: HTMLElement){
     const repo_not_present:string[]=[];
     const bloc_not_present:string[]=[];
 
-    if(forBloc.blocDependencies?.repos){
-        for(let rn of forBloc.blocDependencies.repos){
-            const repo  = ReposProvider.of(rn,context);
-            if(!repo){
-                repo_not_present.push(`<${context.tagName}> uses bloc: ${forBloc.name}, which requires <repository>: ${rn}! to function!`);
-            }else{
-                forBloc.reposMap[rn]=repo;
-            }
-        }
-    }
     if(forBloc.blocDependencies?.blocs){
         for(let bn of forBloc.blocDependencies.blocs){
-             const bloc = BlocsProvider.of(bn,context);
+             const bloc = BlocsProvider.search(bn,context);
              if(!bloc){
                 bloc_not_present.push(`<${context.tagName}> uses bloc: ${forBloc.name}, which requires <bloc>: ${bn}! to function!`);
              }else{

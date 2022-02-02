@@ -1,6 +1,5 @@
 import { HasNameAndHost } from '../base';
 import { BlocsProvider, OtherBlocSearchCriteria } from './blocs-provider';
-import {ReposProvider, Repository} from '../repo/repo-provider';
 
 /**
  * Pure functions:
@@ -37,14 +36,7 @@ export abstract class Bloc<S> extends HasNameAndHost{
     private _listener_id_ref=1;
     private _listeners: _PureFunctionMap<S> ={};
     private _state: S;
-    protected _reposMap:Record<string,Repository>={};
     protected _blocsMap:Record<string,Bloc<any>>={};
-
-    
-    public get reposMap() : Record<string,Repository> {
-      return this._reposMap;
-    }
-
     
     public get blocsMap() : Record<string,Bloc<any>> {
       return this._blocsMap;
@@ -62,7 +54,7 @@ export abstract class Bloc<S> extends HasNameAndHost{
     getBloc<B extends Bloc<any>>(bloc_name:string){
       let b:Bloc<any>|undefined = this._blocsMap[bloc_name];
       if(!b){
-        b = BlocsProvider.of(bloc_name,this.hostElement);
+        b = BlocsProvider.search(bloc_name,this.hostElement);
         if(!b){
           throw `<${this.name}> bloc requires bloc: ${bloc_name}! to function!\r\nPossible reason:\r\ngetBloc method called in constructor\r\n${bloc_name} bloc is not present in the reverse DOM hierarchy!`;
         }else{
@@ -72,18 +64,6 @@ export abstract class Bloc<S> extends HasNameAndHost{
       return b as B;
     }
 
-    getRepo<R extends Repository>(repo_name:string){
-      let r:Repository|undefined = this._blocsMap[repo_name];
-      if(!r){
-        r = ReposProvider.of(repo_name,this.hostElement);
-        if(!r){
-          throw `<${this.name}> bloc requires repository: ${repo_name}! to function!\r\nPossible reason:\r\ngetRepo method called in constructor of bloc\r\n${repo_name} repository is not present in the reverse DOM hierarchy!`;
-        }else{
-          this._reposMap[repo_name]=r;
-        }
-      }
-      return r as R;
-    }
 
     /**
      * 

@@ -3,7 +3,6 @@ import { TemplateResult, render } from "lit-html";
 import {BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
 import {_setDependenciesForABloc} from '../utils';
-import { config } from "process";
 
 
 export interface BuildWhenFunction<S>{
@@ -11,10 +10,6 @@ export interface BuildWhenFunction<S>{
 }
 
 export interface BlocBuilderConfig<B extends Bloc<S>, S>{
-  /**
-   * @deprecated Use blocs_map instead
-   */
-  useThisBloc?:B;
   buildWhen?: BuildWhenFunction<S>;
   otherSearchCriteria?: OtherBlocSearchCriteria;
   search_blocs?:string[];
@@ -86,10 +81,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       if(!this.configs.buildWhen){
         this.configs.buildWhen = BlocBuilder.stateChangeBuildWhenFunction;
       }
-      if(this.configs.useThisBloc){
-        this.configs.useThisBloc.hostElement=this;
-        this._bloc = this.configs.useThisBloc; 
-      }
+
       if(this.configs.blocs_map){
         for(let k of Object.keys(this.configs.blocs_map)){
           this.configs.blocs_map[k].hostElement=this;
@@ -144,7 +136,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       this.configs!.search_blocs.push(this.nameOfBlocToSearch);
 
       for(let bn of this.configs!.search_blocs){
-        const bloc = BlocsProvider.of(bn,this);
+        const bloc = BlocsProvider.search(bn,this);
         if(!bloc){
           throw `<${this.tagName}> requires bloc: ${bn}! to function!`;
         }else{
@@ -152,7 +144,6 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         }
       }
 
-      this.configs?.useThisBloc?.onConnection(this);
       if(this.configs?.blocs_map){
         for(let b in this.configs.blocs_map){
           this.configs.blocs_map[b].onConnection(this);
@@ -173,7 +164,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     _initialize(){
       //find the bloc
       if(!this._bloc){
-        this._bloc = this.configs!.useThisBloc ? this.configs!.useThisBloc: BlocsProvider.of<B>(this.nameOfBlocToSearch,this,this.configs!.otherSearchCriteria);
+        this._bloc = BlocsProvider.search<B>(this.nameOfBlocToSearch,this,this.configs!.otherSearchCriteria);
       }
       
       //if bloc is found;
@@ -202,7 +193,6 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     }
   
     disconnectedCallback(){
-      this.configs?.useThisBloc?.onDisconnection();
       if(this.configs?.blocs_map){
         for(let b in this.configs.blocs_map){
           this.configs.blocs_map[b].onDisconnection();
