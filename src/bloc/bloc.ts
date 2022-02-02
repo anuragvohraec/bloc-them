@@ -97,11 +97,12 @@ export abstract class Bloc<S> extends HasNameAndHost{
     getBloc<B extends Bloc<any>>(bloc_name:string){
       let b:Bloc<any>|undefined = this._blocsMap[bloc_name];
       if(!b){
-        b = BlocsProvider.search(bloc_name,this.hostElement);
+        b=this.foundListenedBlocs[bloc_name]?.bloc;
         if(!b){
-          throw `[BLOC-THEM] : <${this.name}> bloc requires bloc: ${bloc_name}! to function!\r\nPossible reason:\r\ngetBloc method called in constructor\r\n${bloc_name} bloc is not present in the reverse DOM hierarchy!`;
-        }else{
-          this._blocsMap[bloc_name]=b;
+          b = BlocsProvider.search(bloc_name,this.hostElement);
+          if(!b){
+            throw `[BLOC-THEM] : <${this.name}> bloc requires bloc: ${bloc_name}! to function, but is not present in the reverse DOM hierarchy!`;
+          }
         }
       }
       return b as B;
