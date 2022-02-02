@@ -9,7 +9,7 @@ export interface BuildWhenFunction<S>{
     (previousState: S, newState: S): boolean;
 }
 
-export interface BlocBuilderConfig<B extends Bloc<S>, S>{
+export interface BlocBuilderConfig<S>{
   buildWhen?: BuildWhenFunction<S>;
   otherSearchCriteria?: OtherBlocSearchCriteria;
   search_blocs?:string[];
@@ -31,9 +31,9 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       }
     }
 
-    public configs:BlocBuilderConfig<B,S>;
+    public configs:BlocBuilderConfig<S>;
 
-    public set blocBuilderConfig(bConfig:BlocBuilderConfig<B,S>){
+    public set blocBuilderConfig(bConfig:BlocBuilderConfig<S>){
       if(bConfig.buildWhen){
         this.configs.buildWhen=bConfig.buildWhen;
       }
@@ -60,7 +60,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
      * @param nameOfBlocToSearch Either provide this or provide bloc attribute
      * @param configs 
      */
-    constructor(nameOfBlocToSearch?:string,configs?: BlocBuilderConfig<B,S>){
+    constructor(nameOfBlocToSearch?:string,configs?: BlocBuilderConfig<S>){
       super();
       
       const userSuggestedBlocName = this.getAttribute("bloc");
