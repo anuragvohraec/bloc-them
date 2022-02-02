@@ -67,7 +67,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       nameOfBlocToSearch=userSuggestedBlocName?userSuggestedBlocName:nameOfBlocToSearch;
 
       if(!nameOfBlocToSearch){
-        throw `No bloc name provided for: ${this.tagName}`;
+        throw `[BLOC-THEM] : No bloc name provided for: ${this.tagName}`;
       }
 
       this.nameOfBlocToSearch= nameOfBlocToSearch;
@@ -148,7 +148,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         this._subscriptionId = this._bloc._subscribe(l);
         this._build(this._prevState);
       }else{
-        throw `No parent found which has ${this.nameOfBlocToSearch} bloc`;
+        throw `[BLOC-THEM] : No parent found which has ${this.nameOfBlocToSearch} bloc`;
       }
     }
   
@@ -210,7 +210,7 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
       for(let bloc_name of this.config.subscribed_blocs){
         let foundBloc = Bloc.search<Bloc<any>>(bloc_name,this);
         if(!foundBloc){
-          throw `${this.tagName} depends upon bloc ${bloc_name} , but is not found in the DOM tree`;
+          throw `[BLOC-THEM] : ${this.tagName} depends upon bloc ${bloc_name} , but is not found in the DOM tree`;
         }else{
           this.found_blocs[bloc_name] = foundBloc;
         }

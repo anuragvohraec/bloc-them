@@ -14,7 +14,7 @@ export class CounterApexBloc extends ApexBloc{
     }
 
     notifyAttributeChange<T>(newValue: T): void {
-        throw new Error("Method not implemented.");
+        throw new Error("[BLOC-THEM] : Method not implemented.");
     }
     protected _name: string="CounterApexBloc";
 }

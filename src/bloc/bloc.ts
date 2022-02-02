@@ -56,21 +56,18 @@ export abstract class Bloc<S> extends HasNameAndHost{
           let fb = Bloc.search(b,this.hostElement);
           if(!fb){
             this.foundListenedBlocs={};
-            throw `${this._name.toUpperCase()} hosted on ${ctx.tagName} depends upon ${b} bloc, which is not found the parent DOMs!`
+            throw `[BLOC-THEM] : ${this._name.toUpperCase()} hosted on ${ctx.tagName} depends upon ${b} bloc, which is not found the parent DOMs!`
           }
-          this.foundListenedBlocs[b]={
-            bloc:fb,
-            subscriber_id:""
-          };
-      }
 
-      //now lets listen to them
-      for(let b of Object.keys(this.foundListenedBlocs)){
           let t:any = (newState:any)=>{
               this.reactToStateChangeFrom(b,newState);
           };
           t._ln_name=b;
-          this.foundListenedBlocs[b].subscriber_id=this.foundListenedBlocs[b].bloc._subscribe(t);
+
+          this.foundListenedBlocs[b]={
+            bloc:fb,
+            subscriber_id:fb._subscribe(t)
+          };
       }
     }
 
@@ -80,7 +77,11 @@ export abstract class Bloc<S> extends HasNameAndHost{
     public onDisconnection(){
       //stop listening
       for(let b of Object.keys(this.foundListenedBlocs)){
-        this.foundListenedBlocs[b].bloc._unsubscribe(this.foundListenedBlocs[b].subscriber_id);
+        try{
+          this.foundListenedBlocs[b].bloc._unsubscribe(this.foundListenedBlocs[b].subscriber_id);
+        }catch(e){
+          console.error(e);
+        }
       }
     }
     
@@ -98,7 +99,7 @@ export abstract class Bloc<S> extends HasNameAndHost{
       if(!b){
         b = BlocsProvider.search(bloc_name,this.hostElement);
         if(!b){
-          throw `<${this.name}> bloc requires bloc: ${bloc_name}! to function!\r\nPossible reason:\r\ngetBloc method called in constructor\r\n${bloc_name} bloc is not present in the reverse DOM hierarchy!`;
+          throw `[BLOC-THEM] : <${this.name}> bloc requires bloc: ${bloc_name}! to function!\r\nPossible reason:\r\ngetBloc method called in constructor\r\n${bloc_name} bloc is not present in the reverse DOM hierarchy!`;
         }else{
           this._blocsMap[bloc_name]=b;
         }
@@ -136,7 +137,7 @@ export abstract class Bloc<S> extends HasNameAndHost{
                   this._listeners[`${l}`](newState);
                 }
             }catch(e){
-                console.log(`Listener ${this._listeners[l]?._ln_name} do not have try catch bloc. It throws error which is not caught in its pure function.`);
+                console.log(`[BLOC-THEM] : Listener ${this._listeners[l]?._ln_name} do not have try catch bloc. It throws error which is not caught in its pure function.`);
                 console.error(e);
             }
         }
