@@ -35,9 +35,7 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
         this._build();
         if(this._blocsMap){
             for(let b in this._blocsMap){
-              setImmediate(()=>{
-                this._blocsMap[b].onConnection(this);
-              });
+              Promise.resolve().then(()=>this._blocsMap[b].onConnection(this));
             }
         }
     }

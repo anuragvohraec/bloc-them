@@ -112,9 +112,9 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       if(this._blocBuilderConfig?.blocs_map){
         for(let b in this._blocBuilderConfig.blocs_map){
           const bloc= this._blocBuilderConfig.blocs_map[b];
-          setImmediate(()=>{
+          Promise.resolve().then(()=>{
             bloc.onConnection(this);
-          })
+          });
         }
       }
     }
@@ -153,7 +153,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         this._subscriptionId = this._bloc._subscribe(listenerForNewState);
         this._build(this._prevState);
       }else{
-        throw `[BLOC-THEM] : No parent found which has ${this.nameOfBlocToSearch} bloc`;
+        throw `[BLOC-THEM] : ${this.tagName} depends upon bloc ${this.nameOfBlocToSearch} , but is not found in the DOM tree`;
       }
     }
   
@@ -241,9 +241,9 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
       if(this.config.blocs_map){
         for(let b in this.config.blocs_map){
           let bloc=this.config.blocs_map[b];
-          setImmediate(()=>{
+          Promise.resolve().then(()=>{
             bloc.onConnection(this);
-          })
+          });
         }
       }
     }
