@@ -83,6 +83,8 @@ export abstract class Bloc<S> extends HasNameAndHost{
           console.error(e);
         }
       }
+      //@ts-ignore
+      this.hostElement=undefined;
     }
     
     /**

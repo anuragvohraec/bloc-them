@@ -31,25 +31,29 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       }
     }
 
-    public configs:BlocBuilderConfig<S>;
+    private _blocBuilderConfig: BlocBuilderConfig<S>;
+
+    public get blocBuilderConfig(): BlocBuilderConfig<S> {
+      return this._blocBuilderConfig;
+    }
 
     public set blocBuilderConfig(bConfig:BlocBuilderConfig<S>){
       if(bConfig.buildWhen){
-        this.configs.buildWhen=bConfig.buildWhen;
+        this._blocBuilderConfig.buildWhen=bConfig.buildWhen;
       }
       if(bConfig.otherSearchCriteria){
-        this.configs.otherSearchCriteria=bConfig.otherSearchCriteria;
+        this._blocBuilderConfig.otherSearchCriteria=bConfig.otherSearchCriteria;
       }
 
       //merges new config onto old config
       if(bConfig.blocs_map){
-        if(!this.configs.blocs_map){
-          this.configs.blocs_map={};
+        if(!this._blocBuilderConfig.blocs_map){
+          this._blocBuilderConfig.blocs_map={};
         }
-        this.configs.blocs_map={...this.configs.blocs_map,...bConfig.blocs_map};
+        this._blocBuilderConfig.blocs_map={...this._blocBuilderConfig.blocs_map,...bConfig.blocs_map};
 
         if(bConfig.blocs_map[this.nameOfBlocToSearch]){
-          this._bloc = this.configs.blocs_map[this.nameOfBlocToSearch] as B;
+          this._bloc = this._blocBuilderConfig.blocs_map[this.nameOfBlocToSearch] as B;
           this._build(this._bloc.state);
         }
       }
@@ -73,20 +77,19 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
       this.nameOfBlocToSearch= nameOfBlocToSearch;
 
       if(!configs){
-        this.configs={};
+        this._blocBuilderConfig={};
       }else{
-        this.configs=configs;
+        this._blocBuilderConfig=configs;
       }
 
-      if(!this.configs.buildWhen){
-        this.configs.buildWhen = BlocBuilder.stateChangeBuildWhenFunction;
+      if(!this._blocBuilderConfig.buildWhen){
+        this._blocBuilderConfig.buildWhen = BlocBuilder.stateChangeBuildWhenFunction;
       }
 
-      if(this.configs.blocs_map){
-        for(let k of Object.keys(this.configs.blocs_map)){
-          this.configs.blocs_map[k].hostElement=this;
+      if(this._blocBuilderConfig.blocs_map){
+        for(let k of Object.keys(this._blocBuilderConfig.blocs_map)){
           if(k === this.nameOfBlocToSearch){
-            this._bloc = this.configs.blocs_map[k] as B;
+            this._bloc = this._blocBuilderConfig.blocs_map[k] as B;
           }
         }
       }
@@ -106,9 +109,9 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     protected connectedCallback(){
       this._initialize();
 
-      if(this.configs?.blocs_map){
-        for(let b in this.configs.blocs_map){
-          const bloc= this.configs.blocs_map[b];
+      if(this._blocBuilderConfig?.blocs_map){
+        for(let b in this._blocBuilderConfig.blocs_map){
+          const bloc= this._blocBuilderConfig.blocs_map[b];
           setImmediate(()=>{
             bloc.onConnection(this);
           })
@@ -124,7 +127,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     _initialize(){
       //find the bloc
       if(!this._bloc){
-        this._bloc = BlocsProvider.search<B>(this.nameOfBlocToSearch,this,this.configs!.otherSearchCriteria);
+        this._bloc = BlocsProvider.search<B>(this.nameOfBlocToSearch,this,this._blocBuilderConfig!.otherSearchCriteria);
       }
       
       //if bloc is found;
@@ -132,7 +135,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         this._prevState = this._bloc.state;
         const l : PureFunction<S>= (newState: S)=>{
           try{
-            if(this.configs!.buildWhen!(this._prevState, newState)){
+            if(this._blocBuilderConfig!.buildWhen!(this._prevState, newState)){
               this._build(newState);
               this._prevState = newState;
             }
@@ -153,9 +156,9 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     }
   
     disconnectedCallback(){
-      if(this.configs?.blocs_map){
-        for(let b in this.configs.blocs_map){
-          this.configs.blocs_map[b].onDisconnection();
+      if(this._blocBuilderConfig?.blocs_map){
+        for(let b in this._blocBuilderConfig.blocs_map){
+          this._blocBuilderConfig.blocs_map[b].onDisconnection();
         }
       }
 
