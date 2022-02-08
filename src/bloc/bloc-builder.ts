@@ -164,7 +164,7 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
         }
       }
 
-      this._bloc!._unsubscribe(this._subscriptionId);
+      this._bloc?._unsubscribe(this._subscriptionId);
     }
 
     protected getRootElement(): Element | DocumentFragment{
