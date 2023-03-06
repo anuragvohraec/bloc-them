@@ -22,11 +22,25 @@ export abstract class HasNameAndHost{
 
 export class BaseBlocsHTMLElement extends HTMLElement{
     private _useAttr?: BlocThemUseAttribute;
+    private usesShadow:boolean;
+
     constructor(){
         super();
-        this.attachShadow({mode: 'open'});
         let t1 = this.getAttribute("use");
         this._useAttr = BaseBlocsHTMLElement.parseUseAttribute(t1);
+        this.usesShadow=false;
+        if(!this.hasAttribute("no_shadow")){
+            this.attachShadow({mode: 'open'});
+            this.usesShadow=true;
+        }
+    }
+
+    protected getRootElement(): Element | DocumentFragment{
+        if(this.usesShadow){
+            return this.shadowRoot!;
+        }else{
+            return this;
+        }
     }
     
     public get useAttribute() : BlocThemUseAttribute|undefined {

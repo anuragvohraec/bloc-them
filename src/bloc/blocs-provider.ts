@@ -85,9 +85,6 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
         }
     }
 
-    protected getRootElement(): Element | DocumentFragment{
-        return this.shadowRoot!;
-    }
 
     _build(){
         let gui = this.builder();

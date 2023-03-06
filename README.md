@@ -2,26 +2,111 @@
 A Business Logic Component implementation for front end Javascript web components.\
 ![LOGO](./des/logo.svg)
 
-If you have not heard what is Bloc, then check out the [theory](#theory).\
+If you have not heard what is Bloc design pattern, then check out the [theory](#theory).\
 If you are familiar with Bloc, then read descriptions of the components this library offers to use Bloc Pattern for your front end development.
-
-# What it can do ?
-1. **[use-them](https://www.npmjs.com/package/use-them)** ready to use webcomponent for creating PWA mobile apps.
-2. **[lay-them](https://www.npmjs.com/package/lay-them)** to layout your other webcomponents in column, row and stack.
-3. **[route-them](https://www.npmjs.com/package/route-them)** to create routes in your single page application.
 
 ## Pre-requisite for usage
 1. Basic understanding of ES6 classes and inheritance.
 3. Basic knowledge of [lit-html](https://lit-html.polymer-project.org/).
 
 ## Important Classes and uses
-### Bloc<S> Business Logic component which control one type of State.
-### BlocsProvider an HTMLElement webcomponent which provided blocs to items inside its DOM Hierarchy.
-### BlocBuilder an HTMLElement webcomponent which can listen to states from a single bloc and react to state changes from it.
-### MultiBlocsReactiveWidget an HTMLElement webcomponent which can listen to states from various bloc simultaneously and react to state changes from each one of them.
+### Bloc
+Bloc: Business Logic component 
+This class will hold and manage state of your application.
+In below code `CounterBloc` is managing count state of the bloc. `this.emit` function is used to publish new state of the app.
+here increment and decrement function modify the state of the app and publish this new state to UI by `this.emit`
+```js
+class CounterBloc extends Bloc{
+    constructor(){
+        //passing init state
+        super(0);
+    }
+
+    increment=()=>{
+        const newState = this.state+1;
+        this.emit(newState);
+    }
+
+    decrement=()=>{
+        const newState = this.state-1;
+        this.emit(newState);
+    }
+}
+```
+
+### BlocBuilder
+this will create an HTML [web components](https://developer.mozilla.org/en-US/docs/Web/Web_Components), its uses `lit-html` templating library for creating html templates.
+```js
+class CounterAppWidget extends BlocBuilder{
+    constructor(){
+        //passing name of the bloc to subscribe
+        super("CounterBloc",{
+            //blocs map attaches a bloc at a node in DOM tree.
+            blocs_map:{
+                //adding counter bloc here so all element down this node in DOM will listen to this bloc
+                //any change in state of this bloc will update UI for each of such Widget which subscribed to CounterBloc
+                CounterBloc: new CounterBloc()
+            }
+        });
+    }
+
+    builder(state){
+        return html`
+        ${this.styleThis()}
+        <div class="cont">
+            <div class="text">${state}</div>
+            <div class="button inc" @click=${this.bloc.increment}>Increment</div>
+            <div class="button dec" @click=${this.bloc.decrement}>Decrement</div>
+        </div>`;
+    }
+
+    styleThis(){
+        return html`<style>
+            .cont{
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+            }
+            .text{
+                padding: 10px;
+                font-size: 2em;
+            }
+            .button{
+                width: 100px;
+                text-align: center;
+                color: white;
+                padding: 10px;
+                font-size: 1.2em;
+                margin: 10px;
+                user-select: none;
+            }
+
+            .inc{
+                background-color: #77d782;
+            }
+            .dec{
+                background-color: #ff4a4a;
+            }
+        </style>`;
+    }
+}
+customElements.define("my-app",CounterAppWidget);
+```
+### BlocsProvider
+If you don't want state management in a Widget, but do want it to act as `Bloc` provider to its children than use this one.
+see source code for usage
+
+### MultiBlocsReactiveWidget
+An HTMLElement webcomponent which can listen to states from various bloc simultaneously and react to state changes from each one of them.
+See source code for usage.
 
 **use-them** is set of webcomponents created on top of bloc-them library. They are ready to use webcomponents for creating mobile apps.
 
+# What it can do ?
+1. **[use-them](https://www.npmjs.com/package/use-them)** ready to use webcomponent for creating PWA mobile apps.
+2. **[lay-them](https://www.npmjs.com/package/lay-them)** to layout your other webcomponents in column, row and stack.
+3. **[route-them](https://www.npmjs.com/package/route-them)** to create routes in your single page application.
 
 
 ## Installation
@@ -166,21 +251,21 @@ Then all logics(**non gui codes** which perform the actual intent of your app) t
 3. Say you are writing a Social media app.
 then all logics(**non gui codes** which perform the actual intent of your app) that you will write specifically for your social media pp, say **fetch_user_profile**, **add_new_user_to_indexedb**,or any other non-gui function(one which do not render's GUI to screen), is termed as Business Logic.
 
-Business logic is the basic functionality of your app, which you ae trying to offer to client apart frm pretty GUI.
+Business logic is the basic functionality of your app, which you are trying to offer to client apart from pretty GUI.
 
 ### The core aim of business logic ?
-The core aim of a business logic is to modulate/maintain/control a state of your application. 
+The core aim of any business logic is to modulate/maintain/control a state of your application. 
 For example,all non gui code for user sign up form, is trying to maintain an object which has all form information user has entered in the form or required to submit the sign up form.
 
 So **the core aim business logic is to modulate state of your app.**
-Whenever it modulates this state, the front end GUI, which depends on this state muts re-render to give the latest update to user.
+Whenever it modulates this state, the front end GUI, which depends on this state must re-render to give the latest update to user.
 
 
 For example user types in something in the search box for an app.
 The Search box will try to validate it.
 Then tries to make a request to resource, which will give the result and once received response from the sources system, may need to modify it to display appropriately on front end GUI.
 
-### Whats the problem with existing JS system ?
+### What are the problem with existing JS system ?
 If you are using vanilla JS to design a big sized app, then there is 99.99% probability, that the one who will maintain your apps for bugs,  will pull their hairs to keep track of places where in you as a developer have written the business logic, which controls state of the application. 
 
 Without a framework, the business logic is spread every where, which experience says is very difficult to track, which ultimate will make a challenge to determine, why the current state of your app is something out of expectation, and further which portion of your code is responsible for that modification.
@@ -199,4 +284,4 @@ And your GUI uses this state to render out put data. So if the data is incorrect
 
 ## Build instruction
 1. Roll up `npx rollup -c rollup.config.js`
-2. Directly import it into project
+2. Directly import it into project, for example `import {Bloc} from "/bloc-them/index.js`

@@ -166,10 +166,6 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
       this._bloc?._unsubscribe(this._subscriptionId);
     }
-
-    protected getRootElement(): Element | DocumentFragment{
-      return this.shadowRoot!;
-    }
     
     _build(state: S){
        let gui = this.builder(state);
@@ -273,10 +269,6 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
   }
 
   abstract build(state?:S):TemplateResult;
-
-  protected getRootElement(): Element | DocumentFragment{
-    return this.shadowRoot!;
-  }
 
   protected _build(){
     let newState = this.convertSubscribedStatesToReactiveState(this.subscribed_states);
