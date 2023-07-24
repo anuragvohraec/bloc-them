@@ -1,5 +1,6 @@
 # Bloc-Them
-A Business Logic Component implementation for front end Javascript web components.\
+The simplest, but mighty, UI framework, a JS developer can learn in less han half an hour!
+Based on Business Logic Component implementation for front end Javascript web components.\
 ![LOGO](./des/logo.svg)
 
 If you have not heard what is Bloc design pattern, then check out the [theory](#theory).\
@@ -7,9 +8,7 @@ If you are familiar with Bloc, then read descriptions of the components this lib
 
 ## Pre-requisite for usage
 1. Basic understanding of ES6 classes and inheritance.
-3. Basic knowledge of [lit-html](https://lit-html.polymer-project.org/).
 
-## Important Classes and uses
 ### Bloc
 Bloc: Business Logic component 
 This class will hold and manage state of your application.
@@ -35,7 +34,7 @@ class CounterBloc extends Bloc{
 ```
 
 ### BlocBuilder
-this will create an HTML [web components](https://developer.mozilla.org/en-US/docs/Web/Web_Components), its uses `lit-html` templating library for creating html templates.
+this will create an HTML [web components](https://developer.mozilla.org/en-US/docs/Web/Web_Components), its uses template functions `html` to create HTML Node.
 ```js
 class CounterAppWidget extends BlocBuilder{
     constructor(){
@@ -132,6 +131,10 @@ To run a local development server that serves the basic demo located in `demo/in
 
 
 ## Change logs
+### "version": 8.0.0
+1. Removed Lit-HTML and created own in build templating. Following function are available `html`, `render`, `repeat`.
+2. Removed Apex Bloc and `unsafeHTML` function usage.
+
 ### "version": "6.0.0"
 1. Deprecated concept of Repository and RepoProvider. Use Blocs provider instead. Repo Provider had no significance, and has been marked as deprecated long back
 2. Bloc now can subscribe to other blocs , by passing listenToBlocs array. Whenever state of this parent bloc changes they will call reactToStateChangeFrom(blocName,newState) on this bloc
