@@ -366,6 +366,8 @@ function workOnThisNodes(applicableNodes,values){
                         if(cv){
                             const s =cv?cv.toString():"";
                             currentNode.setAttribute(propertyName,s);
+                        }else{
+                            currentNode.removeAttribute(propertyName);
                         }
                     }else{
                         const s =cv?cv.toString():"";
@@ -400,3 +402,14 @@ export function repeat(items:any[],idFunction:IDFunction,templateFunction:Templa
     });
     return result;
 }
+
+export function unsafeHTML(stringItem:string):TemplateResult{
+    return {
+        _id:[],
+        values:[],
+        //@ts-ignore
+        templates: stringItem
+    };
+}
+
+export const nothing=html``;
