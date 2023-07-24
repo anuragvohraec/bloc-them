@@ -6,7 +6,7 @@ const TSNT=`<!--${ASNT}--> <!--${ESNT}-->`;
 
 export interface TemplateResult{
     _id:any;
-    templates:TemplateStringsArray[],
+    templates:TemplateStringsArray,
     values:any[];
 }
 
@@ -16,14 +16,13 @@ export interface TemplateResult{
  * @param  {...any} values 
  * @returns 
  */
-export function html(templates:TemplateStringsArray[],...values:unknown[]):TemplateResult{
+export function html(templates:TemplateStringsArray,...values:unknown[]):TemplateResult{
     const t = document.createElement("template");
     let s = "";
     let n =templates.length;
 
     for(let t of templates){
         n--;
-        //@ts-ignore
         if(t.trim().endsWith("=")){
             s+=(t+ASNT);
         }else{
