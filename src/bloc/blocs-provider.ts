@@ -1,5 +1,5 @@
 import { Bloc } from "./bloc";
-import { render, TemplateResult } from "lit-html";
+import { render, TemplateResult } from "../template";
 import { BlocBuilder, MultiBlocsReactiveWidget } from "./bloc-builder";
 import {BaseBlocsHTMLElement} from '../base';
 
@@ -88,7 +88,7 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
 
     _build(){
         let gui = this.builder();
-        render(gui,this.getRootElement());
+        render(this.getRootElement(),gui);
      }
  
  

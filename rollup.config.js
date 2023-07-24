@@ -7,8 +7,6 @@ export default {
   output: {
     dir: 'dist',
     paths:{
-      "lit-html": "/js/lit-html/lit-html.js",
-      "lit-html/directives/unsafe-html":"/js/lit-html/directives/unsafe-html.js",
     },
   },
   plugins: [typescript(),terser()],
