@@ -1,5 +1,5 @@
 import { Bloc, PureFunction } from "./bloc";
-import { TemplateResult, render } from "../template";
+import { TemplateResult, render, html } from "../template";
 import {BlocsProvider, OtherBlocSearchCriteria } from "./blocs-provider";
 import {BaseBlocsHTMLElement} from '../base';
 
@@ -168,11 +168,14 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
     }
     
     _build(state: S){
-       let gui = this.builder(state);
-       render(this.getRootElement(),gui);
+      let gui = this.builder(state);
+      if(!gui){
+        gui=html``;
+      }
+      render(this.getRootElement(),gui);
     }
 
-    abstract builder(state: S): TemplateResult;
+    abstract builder(state: S): TemplateResult|undefined;
 }
 
 
@@ -268,14 +271,17 @@ export abstract class MultiBlocsReactiveWidget<S> extends BaseBlocsHTMLElement{
     return prev_state!==new_state;
   }
 
-  abstract build(state?:S):TemplateResult;
+  abstract build(state?:S):TemplateResult|undefined;
 
   protected _build(){
     let newState = this.convertSubscribedStatesToReactiveState(this.subscribed_states);
 
     if(this.build_when(this.state,newState)){
         this.state = newState;
-        let gui :TemplateResult = this.build(this.state);
+        let gui = this.build(this.state);
+        if(!gui){
+          gui=html``;
+        }
         render(this.getRootElement(),gui);
     }
   }
