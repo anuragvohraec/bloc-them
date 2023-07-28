@@ -321,6 +321,10 @@ function workOnThisNodes(applicableNodes,values){
                             cn=nn;
                         }
                     }
+                }else if(cv && cv.constructor===UnsafeHTML){
+                    const df = document.createElement('template');
+                    df.innerHTML = (cv as UnsafeHTML).value;
+                    replaceInBetweenCommentNode(currentNode,df.content); 
                 }else{
                     const tn = new Text(cv);
                     replaceInBetweenCommentNode(currentNode,tn); 
@@ -403,13 +407,32 @@ export function repeat(items:any[],idFunction:IDFunction,templateFunction:Templa
     return result;
 }
 
-export function unsafeHTML(stringItem:string):TemplateResult{
-    return {
-        _id:[],
-        values:[],
-        //@ts-ignore
-        templates: stringItem
-    };
+class UnsafeHTML{
+    constructor(private _value:any){
+    }
+    
+    public get value() : any{
+        return this._value;
+    }
+    
+}
+
+// export function unsafeHTML(stringItem:string):TemplateResult{
+//     const t = document.createElement("template");
+//     t.innerHTML=stringItem;
+//     if(!templateCache.has(stringItem)){
+//         templateCache.set(stringItem,t);
+//     }
+//     return {
+//         _id:[],
+//         values:[],
+//         //@ts-ignore
+//         templates:stringItem
+//     }
+// }
+
+export function unsafeHTML(value:any):UnsafeHTML{
+    return new UnsafeHTML(value);
 }
 
 export const nothing=html``;
