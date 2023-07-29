@@ -67,8 +67,8 @@ export abstract class BlocsProvider extends BaseBlocsHTMLElement{
                 } else if(currentEl instanceof BlocBuilder){
                     if(currentEl.blocName === nameOfBlocToSearch && currentEl.bloc){
                         return currentEl.bloc;
-                    }else if(currentEl.blocBuilderConfig?.blocs_map?.[nameOfBlocToSearch]){
-                        return currentEl.blocBuilderConfig.blocs_map[nameOfBlocToSearch] as B;
+                    }else if(currentEl.blocbuilderconfig?.blocs_map?.[nameOfBlocToSearch]){
+                        return currentEl.blocbuilderconfig.blocs_map[nameOfBlocToSearch] as B;
                     }
                 }else if(currentEl instanceof MultiBlocsReactiveWidget){
                     let foundBloc = currentEl.blocsMap[nameOfBlocToSearch];

@@ -33,11 +33,11 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
     private _blocBuilderConfig: BlocBuilderConfig<S>;
 
-    public get blocBuilderConfig(): BlocBuilderConfig<S> {
+    public get blocbuilderconfig(): BlocBuilderConfig<S> {
       return this._blocBuilderConfig;
     }
 
-    public set blocBuilderConfig(bConfig:BlocBuilderConfig<S>){
+    public set blocbuilderconfig(bConfig:BlocBuilderConfig<S>){
       if(bConfig.buildWhen){
         this._blocBuilderConfig.buildWhen=bConfig.buildWhen;
       }
@@ -54,7 +54,8 @@ export abstract class BlocBuilder<B extends Bloc<S>, S> extends BaseBlocsHTMLEle
 
         if(bConfig.blocs_map[this.nameOfBlocToSearch]){
           this._bloc = this._blocBuilderConfig.blocs_map[this.nameOfBlocToSearch] as B;
-          this._build(this._bloc.state);
+          // this._build(this._bloc.state);
+          this.connectedCallback();
         }
       }
     }
