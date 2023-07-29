@@ -381,7 +381,6 @@ function workOnThisNodes(applicableNodes,values){
                     }else if(currentAttribute.value.match(TSNT)){
                         currentNode.stAt[currentAttribute.name]=currentAttribute.value;
                         t.push(currentAttribute.name);
-                        break;
                     }
                 }
                 for(let a of t){
