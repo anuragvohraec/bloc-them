@@ -98,7 +98,7 @@ function createStaticIterationList(targetNode:Node){
             }
 
             //@ts-ignore
-            if(currentNode.tagName==="STYLE"){
+            if(currentNode?.tagName==="STYLE"){
                 //@ts-ignore
                 if(currentNode.textContent.match(TSNT)||currentNode.script){
                     //@ts-ignore
@@ -179,7 +179,7 @@ function createNodeListBetween(startCommentNode:Node){
             }
 
             //@ts-ignore
-            if(currentNode.tagName==="STYLE"){
+            if(currentNode?.tagName==="STYLE"){
                 //@ts-ignore
                 if(currentNode.textContent.match(TSNT)||currentNode.script){
                     //@ts-ignore
