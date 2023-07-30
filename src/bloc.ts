@@ -11,7 +11,7 @@ interface FoundBlocDetails{
  * @param startingElement 
  * @returns 
  */
-export function findBloc(blocName:string, startingElement:Node){
+export function findBloc<B extends Bloc<any>>(blocName:string, startingElement:Node){
     let currentEl:Node|null = startingElement;
     while(currentEl){
         if(currentEl instanceof ListenerWidget){
