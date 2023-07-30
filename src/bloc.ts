@@ -11,12 +11,12 @@ interface FoundBlocDetails{
  * @param startingElement 
  * @returns 
  */
-export function findBloc<B extends Bloc<any>>(blocName:string, startingElement:Node):B|undefined{
+export function findBloc<B extends Bloc<any>>(blocName:string, startingElement:Element):B|undefined{
     let currentEl:Node|null = startingElement;
     while(currentEl){
         if(currentEl instanceof ListenerWidget){
-            if(currentEl.blocname === blocName && currentEl.bloc){
-                return currentEl.bloc as B;
+            if(currentEl.blocname === blocName && currentEl._bloc){
+                return currentEl._bloc as B;
             }else if(currentEl.hasBloc(blocName)){
                 return currentEl.getHostedBloc(blocName) as B;
             }
@@ -41,7 +41,10 @@ export class Bloc<S>{
     /**
      * The name its given in hosted machine
      */
-    private _blocName?:string;
+    private _blocName?: string | undefined;
+    public get blocName(): string | undefined {
+        return this._blocName;
+    }
 
     constructor(protected initState:S,protected listenToBlocs:string[]=[]){
             this._state=initState;
@@ -112,17 +115,21 @@ export class Bloc<S>{
     }
 }
 
-export abstract class ListenerWidget<S> extends HTMLElement{
+export abstract class ListenerWidget<S=any> extends HTMLElement{
     blocname?:string;
     _hostedblocs:Record<string,Bloc<any>>;
     root:Node;
-    bloc?:Bloc<S>;
+    _bloc?:Bloc<S>;
     subscription_id:number=0;
 
     
     public set hostedblocs(v : Record<string,Bloc<any>>) {
         this._hostedblocs = v;
         this.connectedCallback();
+    }
+
+    bloc<B extends Bloc<S>>(){
+        return this._bloc as B;
     }
     
 
@@ -152,20 +159,20 @@ export abstract class ListenerWidget<S> extends HTMLElement{
         }
 
         if(this.blocname){
-            this.bloc=findBloc(this.blocname,this);
-            if(!this.bloc){
+            this._bloc=findBloc(this.blocname,this);
+            if(!this._bloc){
                 throw `[BLOC-THEM]: ${JSON.stringify({requiredBloc:this.blocname,host: this.tagName, msg: "RequiredBloc not found"})}`;
             }
-            this.subscription_id=this.bloc._subscribe((newState:S)=>{
+            this.subscription_id=this._bloc._subscribe((newState:S)=>{
                 this.rebuild(newState);
             });
         }
-        this.rebuild(this.bloc?.state);
+        this.rebuild(this._bloc?.state);
     }
 
     disconnectedCallback(){
-        if(this.bloc){
-            this.bloc._unsubscribe(this.subscription_id);
+        if(this._bloc){
+            this._bloc._unsubscribe(this.subscription_id);
         }
         for(let blocName in this._hostedblocs){
             this._hostedblocs[blocName].onDisconnection();
