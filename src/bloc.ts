@@ -11,14 +11,14 @@ interface FoundBlocDetails{
  * @param startingElement 
  * @returns 
  */
-export function findBloc<B extends Bloc<any>>(blocName:string, startingElement:Node){
+export function findBloc<B extends Bloc<any>>(blocName:string, startingElement:Node):B|undefined{
     let currentEl:Node|null = startingElement;
     while(currentEl){
         if(currentEl instanceof ListenerWidget){
             if(currentEl.blocname === blocName && currentEl.bloc){
-                return currentEl.bloc;
+                return currentEl.bloc as B;
             }else if(currentEl.hasBloc(blocName)){
-                return currentEl.getHostedBloc(blocName);
+                return currentEl.getHostedBloc(blocName) as B;
             }
         }
         let t:any= currentEl.parentNode;
