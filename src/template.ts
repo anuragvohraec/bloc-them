@@ -421,7 +421,7 @@ function workOnThisNodes(applicableNodes,values){
                             currentNode.removeAttribute(propertyName);
                         }
                     }else{
-                        if(pv && pv.match(TSNT)){
+                        if(pv && pv.match instanceof Function && pv.match(TSNT)){
                             let s = ""+pv;
                             let f = pv.matchAll(TSNT);
                             for(let t of f){
