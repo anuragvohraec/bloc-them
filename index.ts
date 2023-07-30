@@ -1,8 +1,2 @@
-export * from './src/base.js';
-export * from './src/bloc/bloc.js';
-export * from './src/bloc/bloc-builder.js';
-export * from './src/bloc/blocs-provider.js';
 export * from './src/template.js';
-
-// export * from './src/testGui_maker';
-// export * from './src/test_apexBloc';
+export * from './src/bloc.js';

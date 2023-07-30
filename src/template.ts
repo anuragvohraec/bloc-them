@@ -89,13 +89,13 @@ function createStaticIterationList(targetNode:Node){
             }
             //if its custom element simply skip all its child
             //@ts-ignore
-            // if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
-            //     let cn = itr.nextNode();
-            //     while(currentNode.contains(cn)){
-            //         cn=itr.nextNode();
-            //     }
-            //     currentNode=cn;
-            // }
+            if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
+                let cn = itr.nextNode();
+                while(currentNode.contains(cn)){
+                    cn=itr.nextNode();
+                }
+                currentNode=cn;
+            }
 
             //@ts-ignore
             if(currentNode?.tagName==="STYLE"){
@@ -168,15 +168,15 @@ function createNodeListBetween(startCommentNode:Node){
             }
 
             // //if its custom element simply skip all its child
-            // //@ts-ignore
-            // if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
-            //     let cn = itr.nextNode();
-            //     while(currentNode.contains(cn)){
-            //         cn=itr.nextNode();
-            //     }
-            //     //@ts-ignore
-            //     currentNode=cn;
-            // }
+            //@ts-ignore
+            if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
+                let cn = itr.nextNode();
+                while(currentNode.contains(cn)){
+                    cn=itr.nextNode();
+                }
+                //@ts-ignore
+                currentNode=cn;
+            }
 
             //@ts-ignore
             if(currentNode?.tagName==="STYLE"){
