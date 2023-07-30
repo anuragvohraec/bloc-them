@@ -89,13 +89,13 @@ function createStaticIterationList(targetNode:Node){
             }
             //if its custom element simply skip all its child
             //@ts-ignore
-            if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
-                let cn = itr.nextNode();
-                while(currentNode.contains(cn)){
-                    cn=itr.nextNode();
-                }
-                currentNode=cn;
-            }
+            // if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
+            //     let cn = itr.nextNode();
+            //     while(currentNode.contains(cn)){
+            //         cn=itr.nextNode();
+            //     }
+            //     currentNode=cn;
+            // }
 
             //@ts-ignore
             if(currentNode?.tagName==="STYLE"){
@@ -167,16 +167,16 @@ function createNodeListBetween(startCommentNode:Node){
                 }
             }
 
-            //if its custom element simply skip all its child
-            //@ts-ignore
-            if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
-                let cn = itr.nextNode();
-                while(currentNode.contains(cn)){
-                    cn=itr.nextNode();
-                }
-                //@ts-ignore
-                currentNode=cn;
-            }
+            // //if its custom element simply skip all its child
+            // //@ts-ignore
+            // if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
+            //     let cn = itr.nextNode();
+            //     while(currentNode.contains(cn)){
+            //         cn=itr.nextNode();
+            //     }
+            //     //@ts-ignore
+            //     currentNode=cn;
+            // }
 
             //@ts-ignore
             if(currentNode?.tagName==="STYLE"){
@@ -400,10 +400,18 @@ function workOnThisNodes(applicableNodes,values){
                         currentNode[propertyName]=cv;
                     }else if(atName.startsWith("@")){
                         if(pv){
-                            currentNode.removeEventListener(propertyName,pv);
+                            if(pv instanceof Function){
+                                currentNode.removeEventListener(propertyName,pv);
+                            }else if(pv.handleEvent){
+                                currentNode.removeEventListener(propertyName,pv.handleEvent);
+                            }
                         }
                         if(cv){
-                            currentNode.addEventListener(propertyName,cv);
+                            if(cv instanceof Function){
+                                currentNode.addEventListener(propertyName,cv);
+                            }else if(cv.handleEvent && cv.handleEvent instanceof Function){
+                                currentNode.addEventListener(propertyName,cv.handleEvent,cv.capture);
+                            }
                         }
                     }else if(atName.startsWith("?")){
                         if(cv){
