@@ -89,7 +89,7 @@ function createStaticIterationList(targetNode:Node){
             }
             //if its custom element simply skip all its child
             //@ts-ignore
-            if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
+            if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot && targetNode.parentNode){
                 let cn = itr.nextNode();
                 while(currentNode.contains(cn)){
                     cn=itr.nextNode();
@@ -169,7 +169,7 @@ function createNodeListBetween(startCommentNode:Node){
 
             // //if its custom element simply skip all its child
             //@ts-ignore
-            if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot){
+            if(customElements.get(currentNode.tagName.toLowerCase()) && !currentNode.shadowRoot && targetNode.parentNode){
                 let cn = itr.nextNode();
                 while(currentNode.contains(cn)){
                     cn=itr.nextNode();
