@@ -9,7 +9,7 @@ export default {
     paths:{
     },
   },
-  plugins: [typescript()],
+  plugins: [typescript(),terser()],
   external:[],
     
 };

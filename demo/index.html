@@ -1,169 +1,50 @@
-<!doctype html>
-<html lang="en-GB">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <style>
-    body {
-      background: #fafafa;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 <body>
-  <div id="demo"></div>
+    <counter-widget></counter-widget>
+    <script type="module">
+        import {Bloc, ListenerWidget,html, render } from "./index.js";
 
-  <script type="module">
-    import {Bloc, BlocsProvider, BlocBuilder, Repository, ReposProvider} from '../dist/index.js';
-  
-class AlertFunctionality extends Repository{
-  _name="AlertFunctionality";
-  alertUser(){
-    alert("You need to know this!");
-  } 
-  sayHello(){
-    alert("Hello");
-  } 
-}
+        class CounterBloc extends Bloc{
+            constructor(){
+                super(0);
+            }
+            increment(){
+                this.emit(this.state+1);
+            }
+            decrement(){
+                this.emit(this.state-1);
+            }
+        }
 
-class AppUtilProvider extends ReposProvider{
-  constructor(){
-    super({
-      "AlertFunctionality": new AlertFunctionality()
-    });
-  }
-  builder(){
-    return html`<div><slot></slot></div>`;
-  }
-}
-customElements.define("app-utils-provider",AppUtilProvider);
-
-
-
-class ColorController extends Bloc{
-  _name="ColorController";
-
-  constructor(){
-    super("green");
-  }
-  changeColor(color){
-    this.emit(color);
-  }
-}
-
-class AppLevelBlocs extends BlocsProvider{
-  constructor(){
-    super({
-      ColorController: new ColorController()
-    })
-  }
-  builder(){
-    return html`<div><slot></slot></div>`;
-  }
-}
-customElements.define("app-level-blocs",AppLevelBlocs);
-
-class ColorChangingText extends BlocBuilder{
-  constructor(){
-    super("ColorController")
-  }
-  builder(state){
-    return html`<div style="color: ${state}"><slot></slot></div>`;
-  }
-}
-customElements.define("color-changing-text",ColorChangingText);
+        class CounterWidget extends ListenerWidget{
+            constructor(){
+              super({
+                blocName:"CounterBloc",
+                hostedBlocs:{CounterBloc: new CounterBloc()}
+              })
+            }
+            build(state){
+                return html`<div>
+                        <div>
+                            <button @click=${()=>this.bloc().increment()}>increment</button>
+                        </div>
+                        <div>
+                            <button @click=${()=>this.bloc().decrement()}>decrement</button>
+                        </div>
+                        <div>Result: ${state}</div>
+                    </div>`;
+            }
+        }
+        customElements.define("counter-widget",CounterWidget);
+    </script> 
 
 
-
-
-class CounterBloc extends Bloc{
-_name="CounterBloc";
-constructor(){
-    super(0,{repos: ["AlertFunctionality",], blocs:["ColorController"]});
-}
-
-increment(){
-    let n = this.state;
-    n++;
-    this.emit(n);
-    if(n==3){
-      this.getRepo("ColorController").changeColor("red");
-      this.getRepo("AlertFunctionality").alertUser();
-    }
-}
-
-decrement(){
-    let n = this.state;
-    n--;
-    this.emit(n);
-    if(n<3){
-      this.getRepo("ColorController").changeColor("green");
-    }
-}
-
-  sayHello(){
-    this.getRepo("AlertFunctionality").sayHello();
-  }
-}
-
-export class CounterBlocProvider extends BlocsProvider{
-constructor(){
-    super({
-      CounterBloc:new CounterBloc()
-    });
-}
-
-builder(){
-    return html`<div><slot></slot></div>`;
-}
-}
-
-export class CounterBlocBuilder extends BlocBuilder{
-constructor(){
-    super("CounterBloc");
-}
-
-increment=()=>{
-  this.bloc.increment();
-}
-
-decrement=()=>{
-  this.bloc.decrement();
-}
-sayHello=()=>{
-  this.bloc.sayHello();
-}
-
-builder(state){
-    let color = this.useAttribute["color"];
-    return html`
-    <color-changing-text>
-      <div>Current state is : ${state}</div>
-    </color-changing-text>
-    <div><button @click=${this.increment}>increment</button></div>
-    <div><button @click=${this.decrement}>decrement</button></div>
-    <div><button @click=${this.sayHello}>Say Hello</button></div>
-    `;
-}
-}
-
-customElements.define("counter-bloc-provider", CounterBlocProvider);
-customElements.define("counter-bloc-builder", CounterBlocBuilder);
-
-
-    render(
-      html`
-<app-utils-provider>
-  <app-level-blocs>
-    <counter-bloc-provider>
-      <div>
-        <h1>Blocs demo</h1>
-        <counter-bloc-builder use="color: red;"></counter-bloc-builder>
-      </div>
-    </counter-bloc-provider>
-  </app-level-blocs>
-</app-utils-provider>
-      `,
-      document.querySelector('#demo')
-    );
-  </script>
 </body>
 </html>
