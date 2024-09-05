@@ -348,7 +348,7 @@ function workOnThisNodes(applicableNodes,values){
 
                     //if k is less than the length of previous values
                     //this nodes are no more required and hence will be removed
-                    if(k<prevValues.length-1){
+                    if(k<prevValues.length){
                         let cn = prevValues[k].startCommentNode;
                         while(cn!==endCommentNode){
                             let nn = cn.nextSibling;
