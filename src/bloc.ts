@@ -81,14 +81,18 @@ export class Bloc<S>{
             if(!bloc){
                 throw `[BLOC-THEM]: ${JSON.stringify({blocName,requiredBloc:bn, host: hostElement.tagName, msg: "RequiredBloc not found"})}`;
             }
-            const newStateHandler=(newState:any)=>{
-                this.reactToStateChangeFrom(bn,newState);
-            };
 
-            this.foundBlocs[bn]={
-                bloc,
-                subscription_id: bloc._subscribe(newStateHandler)
-            };
+            //this check gives it to listen to new blocs on run time
+            if(!this.foundBlocs[bn]){
+                const newStateHandler=(newState:any)=>{
+                    this.reactToStateChangeFrom(bn,newState);
+                };
+    
+                this.foundBlocs[bn]={
+                    bloc,
+                    subscription_id: bloc._subscribe(newStateHandler)
+                };
+            }
         }
     }
 
