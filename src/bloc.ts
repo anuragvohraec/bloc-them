@@ -114,6 +114,7 @@ export class Bloc<S>{
                 this.listeners[sid](newState);
             }catch(e){
                 console.error(`[BLOC-THEM]: User mistake, listeners should catch their own errors!`);
+                console.error(e);
             }
         }
     }
