@@ -172,7 +172,7 @@ export abstract class ListenerWidget<S=any> extends HTMLElement{
                 this.rebuild(newState);
             });
         }
-        this.rebuild(this._bloc?.state);
+        setTimeout(()=>{this.rebuild(this._bloc?.state);});
     }
 
     disconnectedCallback(){
