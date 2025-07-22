@@ -126,6 +126,7 @@ export abstract class ListenerWidget<S=any> extends HTMLElement{
     root:Node;
     _bloc?:Bloc<S>;
     subscription_id:number=0;
+    private _timeouts:Record<string,number>;
 
     
     public set hostedblocs(v : Record<string,Bloc<any>>) {
@@ -140,6 +141,7 @@ export abstract class ListenerWidget<S=any> extends HTMLElement{
 
     constructor({blocName,hostedBlocs={},isShadow=false}:{blocName?:string,hostedBlocs?:Record<string,Bloc<any>>,isShadow?:boolean}={}){
         super();
+        this._timeouts={};
         this.blocname=blocName;
         if(this.hasAttribute("bloc")){
             this.blocname=this.getAttribute("bloc")!;
@@ -205,4 +207,56 @@ export abstract class ListenerWidget<S=any> extends HTMLElement{
     }
 
     abstract build(state?:S):TemplateResult|undefined;
+
+
+
+    bindInputToState(e:InputEvent, validator?:Function, delay:number=0){
+        ///@ts-ignore
+        const input :HTMLInputElement = e.currentTarget;
+        const name = input.getAttribute("name");
+
+        if(input && name){
+            if(delay){
+                if(this._timeouts[name]){
+                    clearTimeout(this._timeouts[name]);
+                }
+                //@ts-ignore
+                this._timeouts[name]=setTimeout(()=>{
+                    this.applyValidation(input, name, validator);
+                },delay);
+            }else{
+                this.applyValidation(input, name,validator);
+            }
+        }
+    }
+
+    private applyValidation(input: HTMLInputElement, name: string,validator?: Function) {
+        const currentBlocState = this.bloc().state;
+        
+        if (validator) {
+            //@ts-ignore
+            let validity: Record<string, any> = currentBlocState["_validity"];
+            if (!validity) {
+                validity = {};
+                //@ts-ignore
+                currentBlocState["_validity"] = validity;
+            }
+            const validation_result = validator(input.value);
+            if (validation_result) {
+                validity[name] = validation_result;
+            } else {
+                //@ts-ignore
+                delete validity[name];
+                if(Object.keys(validity).length===0){
+                    //@ts-ignore
+                    delete currentBlocState["_validity"];
+                }
+            }
+        }
+
+        //@ts-ignore
+        currentBlocState[name] = input.value;
+
+        this.bloc().emit({ ...currentBlocState});
+    }
 }

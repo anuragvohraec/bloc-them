@@ -8,3 +8,7 @@ Complete rewrite removed `lit-html` and used its own template system
     1. Use `this.listenToBloc.push` to add items
     2. Call `super.onConnection` to create new listener to the bloc
 3. `console.error` is printed for bloc throwing error while in build
+
+## 9.0.2
+1. Dot properties where not called properly and setter were not called.
+2. Added new method `bindInputToState` to **ListenerWidget**, to assist in some basic form validation. Using this an input can be binded to properties on a bloc state.
